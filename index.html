@@ -1,0 +1,411 @@
+﻿<!DOCTYPE HTML>
+<html lang="en">
+    <head>
+		<meta name="viewport" content="user-scalable=no, width=device-width" />
+		<meta name="viewport" content="initial-scale=1.0; maximum-scale=1.0;">
+		<link rel="stylesheet" href="assets/jquery.mobile-1.1.0.min.css" />
+		<link rel="stylesheet" href="assets/jquery.mobile.toast.min.css" /> 
+		<link rel="stylesheet" href="screen.css" />
+    </head>
+    <body>
+		<noscript>
+			<style type="text/css">#message, #addcontact, #sent, #deletecontact, #contacts, #editmessage, #sending, #menu, #selcontacts, #quickreply, #editquickreply, #loginas, #connecting, #options, #about { display:none; }</style>
+			<div class="noscriptmsg">You don't have javascript enabled. Good luck with that.</div>
+		</noscript>
+
+		<div id="message" data-role="page">
+			<div data-role="header" data-position="fixed">
+				<h1>Message<span id="messages-indextotal"> <span id="messages-index"></span> of <span id="messages-total"></span></span></h1>
+				<div data-role="navbar">
+					<ul>
+						<li><a href="#quickreply" id="message-quick" data-icon="back">Quick</a></li>
+						<li><a href="#editmessage" id="message-reply" data-icon="back">Reply</a></li>
+						<li><a href="#message-delete" data-icon="delete">Delete</a></li>
+						<li><a href="#message-prev" data-icon="arrow-l">Previous</a></li>
+						<li><a href="#message-next" data-icon="arrow-r">Next</a></li>
+					</ul>
+				</div>
+			</div>
+			<div class="ui-bar ui-bar-c">
+				<div class="ui-grid-a">
+					<div class="ui-block-a" id="message-sender"></div>
+					<div class="ui-block-b"><div id="message-time" style="text-align:right;"></div></div>
+				</div>
+			</div>
+			<div data-role="content">
+				<div id="message-nomessages" style="text-align:center;"><h1>No Messages</h1></div>
+				<p id="message-text"></p>
+			</div>
+			<div data-role="footer" data-position="fixed">
+				<div data-role="navbar">
+					<ul>
+						<li><a href="#selcontacts" data-icon="star">New Message</a></li>
+						<li><a href="#menu">Menu</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+		<div id="menu" data-role="dialog">
+			<div data-role="header">
+				<h1>&nbsp;</h1>
+			</div>
+			<div data-role="content">
+				<div data-role="controlgroup">
+					<a href="#loginas" data-role="button">Account</a>
+					<a href="#contacts" data-role="button">Contacts</a>
+					<a href="#options" data-role="button">Options</a>
+					<a href="#about" data-role="button">About</a>
+				</div>
+			</div>
+		</div>
+
+		<div id="quickreply" data-role="dialog">
+			<div data-role="header">
+				<h1>Quick Reply</h1>
+				<a href="#editquickreply" data-mini="true">Edit</a>
+			</div>
+			<div data-role="content">
+				<div>
+					<script id="quickreplylist" type="text/x-handlebars-template">
+						<div data-role="controlgroup">
+							{{#each this}}
+							<a href="#sending" data-role="button">{{this}}</a>
+							{{/each}}
+						</div>
+					</script>
+				</div>
+			</div>
+		</div>
+
+		<div id="editquickreply" data-role="dialog">
+			<div data-role="header">
+				<h1>Edit Quick Reply</h1>
+				<a href="#" data-icon="plus" id="editquickreply-addbutton">Add</a>
+			</div>
+			<div data-role="content">
+				<div data-role="fieldcontain" class="ui-hide-label">
+					<label for="editquickreply-add">Add Reply:</label>
+					<input type="text" id="editquickreply-add" placeholder="Add Reply"></input>
+				</div>
+				<div>
+					<script id="editquickreplylist" type="text/x-handlebars-template">
+						<div data-role="controlgroup">
+							{{#each this}}
+							<a href="#" data-role="button" data-icon="minus" data-value="{{this}}">{{this}}</a>
+							{{/each}}
+						</div>
+					</script>
+				</div>
+			</div>
+		</div>
+
+		<div id="selcontacts" data-role="page">
+			<div data-role="header" data-position="fixed">
+				<a href="#messages" data-rel="back" data-icon="back">Back</a>
+				<h1>Select Contacts</h1>
+			</div>
+			<div data-role="content">
+				<ul data-role="listview" data-filter="true">
+					<script id="selcontacts-li-checked" type="text/x-handlebars-template">
+						<li data-icon="check" data-theme="b" data-uri="{{contact.uri}}" data-index="{{index}}"><a href="#">{{contact.name}}</a></li>
+					</script>
+					<script id="selcontacts-li-unchecked" type="text/x-handlebars-template">
+						<li data-icon="plus" data-uri="{{contact.uri}}" data-index="{{index}}"><a href="#">{{contact.name}}</a></li>
+					</script>
+				</ul>
+			</div>
+			<div data-role="footer" data-position="fixed">
+				<div data-role="navbar">
+					<ul>
+						<li><a href="#contacts">Edit</a></li>
+						<li><a href="#editmessage" data-icon="arrow-r">Text of Message</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+				
+		<div id="editmessage" data-role="page">
+			<div data-role="header">
+				<a href="#messages" data-rel="back" data-icon="back">Back</a>
+				<h1>Text of Message</h1>
+			</div>
+			<div data-role="content">
+				<div data-role="fieldcontain" class="ui-hide-label">
+					<label for="editmessage-text">Text:</label>
+					<textarea name="editmessage-text" id="editmessage-text"></textarea>
+				</div>
+				<p id="editmessage-remain">You have <span></span> characters remaining</p>
+			</div>
+			<div data-role="footer" data-position="fixed">
+				<div data-role="navbar">
+					<ul>
+						<li><a href="#sending" data-icon="arrow-r">Send</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		
+		<div id="sending" data-role="page">
+			<div data-role="header">
+				<h1>Sending...</h1>
+			</div>
+			<div data-role="content">
+				<h2>Sending to contact # <span id="sending-contact-index"></span> of <span id="sending-contact-total"></span>...</h2>
+			</div>
+		</div>
+
+		<div id="sent" data-role="page">
+			<div data-role="header" data-position="fixed">
+				<h1>Message Sent</h1>
+			</div>
+			<div data-role="content">
+				<ul data-role="listview">
+					<script id="sent-list" type="text/x-handlebars-template">
+						{{#each this}}
+						<li>
+							<h3>{{name}}</h3>
+							<p>{{phrase}}</p>
+						</li>
+						{{/each}}
+					</script>
+				</ul>
+			</div>
+			<div data-role="footer" data-position="fixed">
+				<div data-role="navbar">
+					<ul>
+						<li><a href="#message" data-icon="arrow-r">OK</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+		<div id="contacts" data-role="page">
+			<div data-role="header" data-position="fixed">
+				<a href="#messages" data-rel="back" data-icon="back">Back</a>
+				<h1>Edit Contacts</h1>
+			</div>
+			<div data-role="content">
+				<ul data-role="listview" data-split-icon="delete" data-filter="true">
+					<script id="contacts-li" type="text/x-handlebars-template">
+						{{resetCount}}
+						{{#each this}}
+						<li>
+							<a href="#">{{this.name}}</a>
+							<a href="#deletecontact?index={{getCount}}"></a>
+						</li>
+						{{/each}}
+					</script>
+				</ul>
+			</div>
+			<div data-role="footer" data-position="fixed">
+				<div data-role="navbar">
+					<ul>
+						<li><a href="#addcontact" data-icon="add">Add</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+		<div id="deletecontact" data-role="dialog">
+			<div data-role="header">
+				<h1>Delete Contact</h1>
+			</div>
+			<div data-role="content">
+				<div>
+					<script id="deletecontact-template" type="text/x-handlebars-template">
+						<h1>{{name}}</h1>
+					</script>
+				</div>
+				<div class="ui-grid-a">
+					<div class="ui-block-a"><a href="#" data-rel="back" data-role="button">No</a></div>
+					<div class="ui-block-b"><a href="#" id="deletecontact-yes" data-rel="back" data-role="button">Yes</a></div>
+				</div>
+			</div>
+		</div>
+		
+		<div id="addcontact" data-role="dialog">
+			<div data-role="header">
+				<h1>Add Contact</h1>
+			</div>
+			<div data-role="content">
+				<form id="addcontact-form">
+					<div data-role="fieldcontain" class="ui-hide-label">
+						<label for="addcontact-name">Name:</label>
+						<input type="text" id="addcontact-name" name="name" class="required" placeholder="Name"></input>
+					</div>
+					<div data-role="fieldcontain" class="ui-hide-label">
+						<label for="addcontact-uri">Address:</label>
+						<input type="text" id="addcontact-uri" name="uri" class="required email" placeholder="Address, e.g. joe@officesip.local"></input>
+					</div>
+					<div class="ui-grid-a">
+						<div class="ui-block-a"><a href="#" data-rel="back" data-role="button">Cancel</a></div>
+						<div class="ui-block-b"><a href="#" id="addcontact-ok" data-rel="back" data-role="button">Ok</a></div>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		
+		<div id="loginas" data-role="page">
+			<div data-role="header">
+				<a href="#start" data-rel="back" data-icon="back">Back</a>
+				<h1>Login As</h1>
+			</div>
+			<div data-role="content">
+				<form id="loginas-form">
+					<div data-role="fieldcontain" class="ui-hide-label">
+						<label for="login-name">Username:</label>
+						<input type="text" id="login-name" name="name" placeholder="Username" value=""></input>
+					</div>
+					<div data-role="fieldcontain" class="ui-hide-label">
+						<label for="login-domain">Domain:</label>
+						<input type="text" id="login-domain" name="domain" value="" placeholder="Domain"></input>
+					</div>
+					<div data-role="fieldcontain" class="ui-hide-label">
+						<label for="login-password">Password:</label>
+						<input type="password" id="login-password" name="password" placeholder="Password" value=""></input>
+					</div>
+					<div data-role="fieldcontain" class="ui-hide-label">
+						<label for="login-address">Proxy address:</label>
+						<input type="text" id="login-address" name="proxy" placeholder="Proxy address" value=""></input>
+					</div>
+				</form>
+			</div>
+			<div data-role="footer" data-position="fixed">
+				<div data-role="navbar">
+					<ul>
+						<li><a href="#logout">Logout</a></li>
+						<li><a href="#login" data-icon="check">Login</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		
+		<div id="options" data-role="page">
+			<div data-role="header">
+				<a href="#start" data-rel="back" data-icon="back">Back</a>
+				<h1>Options</h1>
+			</div>
+			<div data-role="content">
+				<form id="options-form">
+					<label for="options-play-i"><input type="checkbox" id="options-play-i" name="playWhenArrives" value="true"></input>Play a sound when a new message arrives</label>
+					<label for="options-play-o"><input type="checkbox" id="options-play-o" name="playAfterSending" value="true"></input>Play a sound after sending message</label>
+				</form>
+				<!--
+				<label for="options-delete"><input type="checkbox" id="options-delete"></input>Minimize to tray after sending a message</label>
+				<label for="options-delete"><input type="checkbox" id="options-delete"></input>Delete message on reply</label>
+				-->
+			</div>
+		</div>
+
+		<div id="about" data-role="page">
+			<div data-role="header">
+				<a href="#start" data-rel="back" data-icon="back">Back</a>
+				<h1>About</h1>
+			</div>
+			<div data-role="content">
+				<h2>BreifMsg 0.9</h2>
+				<p>Homepage: <a href="http://www.briefmsg.org">briefmsg.org</a></p>
+			</div>
+		</div>
+
+		<script id="toasts" type="text/x-handlebars-template">
+			<div>
+				<div class="toast-connected" data-role="toast" data-duration="5000">Connected</div>
+				<div class="toast-connecting" data-role="toast" data-duration="600000">Connecting...</div>
+				<div class="toast-disconnecting" data-role="toast" data-duration="600000">Disconnecting...</div>
+				<div class="toast-disconnected" data-role="toast" data-duration="3000">Disconnected</div>
+				<div class="toast-connect-error" data-role="toast" data-duration="7000">Failed to connect: <span></span></div>
+			</div>
+		</script>
+		
+		<script src="assets/jquery-1.7.1.min.js"></script>
+		<script src="assets/jquery.mobile-1.1.0.min.js"></script>
+		<script src="assets/jquery.validate.min.js"></script>
+		<script src="assets/jquery.mobile.toast.min.js"></script>
+		<script src="assets/jquery.officesipWebSocket.js"></script>
+		<script src="assets/handlebars-1.0.0.beta.6.js"></script>
+		<script src="assets/typedarray.js"></script>
+		
+		<script src="controller.js"></script>
+		<script src="src/tinySIP/src/tsip_api.js"></script>
+		<script src="sipclient.js"></script>
+		<script src="debug.js"></script>
+		
+		<script type="text/javascript">
+		(function (){
+		
+			function loadJsonedObject(key, defaultValue){
+				var jsoned;
+				if(localStorage)
+					jsoned = localStorage.getItem(key);
+				return (jsoned == undefined) ? defaultValue : JSON.parse(jsoned);
+			}
+			
+			function saveJsonedObject(key, value){
+				localStorage.setItem(key, JSON.stringify(value));
+			}
+			
+			function loadMessages(){
+				var messages = loadJsonedObject('com.briefmsg.messages', []);
+				for(var i=0; i<messages.length; i++)
+					messages[i].time = new Date(messages[i].time);
+				return messages;
+			}
+			
+			function saveMessages(messages){
+				saveJsonedObject('com.briefmsg.messages', messages);
+			}
+			
+			function loadLoginInfo(){
+				return loadJsonedObject('com.briefmsg.login', {domain:'officesip.local'});
+			}
+		
+			var ui = new controller();
+			var sip = new sipClient();
+			
+			ui.setOptions(loadJsonedObject('com.briefmsg.options', {playWhenArrives:true, playAfterSending:false}))
+			ui.setLoginInfo(loadLoginInfo());
+			ui.setContacts(loadJsonedObject('com.briefmsg.contacts', []));
+			ui.setMessages(loadMessages());
+			ui.setQuickReplies(loadJsonedObject('com.briefmsg.quicks',
+				['Thank you!', 'Sorry, I am busy', 'Wait a moment...', 'OK', 'Yes', 'No', 'Ask them to leave a message',
+				'Tell them to call me back', 'I will call them back', 'Yes, I know']));
+			
+			
+			ui.on('optionschanged', function(e) {
+				saveJsonedObject('com.briefmsg.options', e.options);
+			});
+			
+			ui.on('messageschanged', function(e) {
+				saveMessages(e.messages);
+			});
+
+			ui.on('quickreplieschanged', function(e) {
+				saveJsonedObject('com.briefmsg.quicks', e.quicks);
+			});
+			
+			ui.on('contactschanged', function(e) {
+				saveJsonedObject('com.briefmsg.contacts', e.contacts);
+			});
+			
+			ui.on('login', function(e) {
+				saveJsonedObject('com.briefmsg.login', e.login);
+				sip.register(e.login.name, e.login.domain, e.login.password, e.login.proxy);
+			});
+
+			ui.on('send', function(e) {
+				sip.send(e.to, e.text);
+			});
+
+			ui.on('logout', sip.unRegister);
+			
+			sip.onAny(ui.trigger);
+
+			console.log("js - ok!");
+		})();
+		
+		</script>
+	</body>
+</html>
