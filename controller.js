@@ -191,8 +191,11 @@ var controller = function (){
 			return (this.updateControls() < maxLength);
 		}
 
-		this.onPageShow = function(){
+		this.onPageBeforeShow = function(){
 			this.updateControls();
+		}
+		
+		this.onPageShow = function(){
 			timer = setInterval(this.updateControls, 1000);
 		}
 		
@@ -482,8 +485,10 @@ var controller = function (){
 			var done = (index >= total);
 			
 			if(done){
-				main.internalTrigger({type:'sent'});
-				$.mobile.changePage('#sent', {reverse:false, changeHash:false});
+				setTimeout(function(){
+					main.internalTrigger({type:'sent'});
+					$.mobile.changePage('#sent', {reverse:false, changeHash:false});
+				}, 1);
 			}
 
 			return done;

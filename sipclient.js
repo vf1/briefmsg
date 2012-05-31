@@ -206,7 +206,7 @@ var sipClient = function (){
 						sender: uri.s_scheme + ':' + uri.s_user_name + '@' + uri.s_host,
 						time: new Date(),
 						text: evt.get_message().get_content_as_string()
-						});
+					});
 					break;
 				}
 			case tsip_event_message_type_e.AO_MESSAGE:
