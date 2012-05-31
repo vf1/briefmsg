@@ -121,16 +121,22 @@ var controller = function (){
 		});
 		
 		var createContacts = function(){
-			allContacts = contacts.concat(getNewFromMessages()).sort();
+			allContacts = addFromMessages(contacts.slice(0)).sort();
 		}
 		
-		var getNewFromMessages = function(){
-			var result = [];
+		var addFromMessages = function(array){
 			for(var i=0; i<messages.length; i++){
-				if(isContactContainUri(messages[i].sender) == false)
-					result.push({ name: messages[i].sender.substring(4), uri: messages[i].sender });
+				if(isContain(array, messages[i].sender) == false)
+					array.push({ name: messages[i].sender.substring(4), uri: messages[i].sender });
 			}
-			return result;
+			return array;
+		}
+		
+		var isContain = function(array, uri){
+			for(var i=0; i<array.length; i++)
+				if(array[i].uri == uri)
+					return true;
+			return false;
 		}
 	};
 	
