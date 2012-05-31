@@ -1,0 +1,4 @@
+briefmsg
+========
+
+JavaScript SIP messenger
