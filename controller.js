@@ -225,6 +225,10 @@ var controller = function (){
 		var nameCtrl = $('#addcontact-name');
 		var uriCtrl = $('#addcontact-uri');
 		
+		var ctrl = new function(){
+			this.form = $('#addcontact-form');
+		}
+		
 		this.update = function(){
 			template.empty().append(contacts);
 			template.container.listview('refresh');
@@ -253,7 +257,7 @@ var controller = function (){
 			main.internalTrigger({type:'contactschanged', contacts:contacts});
 		};
 
-		var validator = $('#addcontact-form').validate({
+		var validator = ctrl.form.validate({
 			onsubmit: false,
 			rules: {
 				name: {
@@ -267,6 +271,8 @@ var controller = function (){
 			},
 			errorElement: 'div'
 		});
+
+		ctrl.form.on('submit', function() { return editcontact.onAdd(); });
 		
 		var that = this;
 		
@@ -346,17 +352,14 @@ var controller = function (){
 			if(connected == false){
 				if(validator.form()){
 					enableControls(false);
-					//var param = {type:'login'};
-					//var array = form.serializeArray();
-					//for(var i in array)
-					//	param[array[i].name]=array[i].value;
-					//main.internalTrigger(param);
 					main.internalTrigger({type:'login', login:getFormData(form)});
 					return true;
 				}
 			}
 			return false;
 		}
+		
+		form.on('submit', function() { return loginas.onLogin(); });
 	
 		var that = this;
 		
@@ -511,6 +514,8 @@ var controller = function (){
 			});
 			main.internalTrigger({type:'optionschanged', options:opt});
 		}
+		
+		form.on('submit', function() { return false; });
 	}
 
 
