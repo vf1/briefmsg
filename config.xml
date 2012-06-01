@@ -5,7 +5,7 @@
     <description>An simple SIP messenger.</description>
     <author href="https://briefmsg.org" email="support@briefmsg.org">Vitali Fomine</author>
 
-	<icon src="images/main.gif" />
+	<icon src="images/icon.png" />
 	<gap:splash src="images/splash.png" />
 
 </widget>
