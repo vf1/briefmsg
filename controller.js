@@ -683,7 +683,7 @@ var controller = function (){
 			this.update();
 			main.internalTrigger({type:'messageschanged', messages:messages});
 		};
-	
+		
 		this.onConnected = this.update;
 		this.onDisconnected = this.update;
 		
@@ -936,11 +936,17 @@ var controller = function (){
 	this.onDisconnected = function(){
 		connected = false;
 	};
+
+	var isMenuAvailable = false;
 	
 	this.onPageBeforeShow = function(event){
 		if(event.target.id == 'message'){
+			isMenuAvailable = true;
 			editmsg.clear();
 			selcontacts.clear();
+		}
+		else{
+			isMenuAvailable = false;
 		}
 	}
 
@@ -958,13 +964,28 @@ var controller = function (){
 				main.internalTrigger({type:'login', login:loginInfo});
 			}, 2000);
 		}
+
+		// PhoneGap
+		document.addEventListener('deviceready', onDeviceReady, false);
 	};
 	
 	$(window).on('load', function(event){
 		main.onLoad();
 	});
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	// PhoneGap
+    function onDeviceReady() {
+        document.addEventListener('menubutton', function() { main.onMenuButton(); }, false);
+    }
 
+	this.onMenuButton = function(){
+		if(isMenuAvailable)
+			$.mobile.changePage('#menu');
+	}
 
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	// TASK REGISTRATION
 	tasks.register('*', this);
 	tasks.register('message', messagesui);
 	tasks.register('sending', sending);
