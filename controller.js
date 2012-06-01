@@ -50,6 +50,7 @@ var controller = function (){
 	var messages = [];
 	var connected = false;
 	var options;
+	var initialHistoryLength;
 	
 	var findContactByUri = function(uri){
 		for(var i=0; i<contacts.length; i++)
@@ -212,7 +213,7 @@ var controller = function (){
 		this.onSendBtn = function(){
 			if(ctrl.text.val().length > 0){
 				setTimeout(function(){
-					$.mobile.changePage(ctrl.send.attr('href'), { changeHash: false });
+					$.mobile.changePage('#sending', { changeHash: false });
 				}, 1);
 				main.internalTrigger({type: 'send', to: selcontacts.getSelected(), text: this.getText()});
 			}
@@ -538,6 +539,10 @@ var controller = function (){
 		var template1 = createTemplate('#sent-list');
 		var results = new Array();
 
+		var ctrl = new function(){
+			this.ok = $('#sent a.[href="#message"]');
+		}
+
 		this.onSend = function(){
 			results = new Array();
 		}
@@ -558,6 +563,21 @@ var controller = function (){
 			template1.append(results);
 			template1.container.listview('refresh');
 		}
+
+		this.onOkBtn = function(e){
+			if(typeof initialHistoryLength !== 'undefined' && typeof history.length !== 'undefined'){
+				history.go(initialHistoryLength - history.length);
+			}
+			else{
+				console.log('Do not know initialHistoryLength, go to #message');
+				$.mobile.changePage('#message');
+			}
+		}
+		
+		ctrl.ok.on('click', function(){
+			sent.onOkBtn();
+			return false;
+		});
 
 		var findResult = function(id){
 			for(var i=0; i<results.length; i++)
@@ -617,6 +637,12 @@ var controller = function (){
 			enableButton(ctrl.deletex, messages.length > 0);
 			enableButton(ctrl.newMessage, connected);
 		};
+		
+		this.onPageShow = function(){
+			if(typeof initialHistoryLength === 'undefined'){
+				initialHistoryLength = history.length;
+			}
+		}
 
 		this.onNext = function(){
 			if(this.index < messages.length-1){
