@@ -210,10 +210,13 @@ var controller = function (){
 		}
 		
 		this.onSendBtn = function(){
-			if(ctrl.text.val().length <= 0)
-				return false;
-			main.internalTrigger({type: 'send', to: selcontacts.getSelected(), text: this.getText()});
-			return true;
+			if(ctrl.text.val().length > 0){
+				setTimeout(function(){
+					$.mobile.changePage(ctrl.send.attr('href'), { changeHash: false });
+				}, 1);
+				main.internalTrigger({type: 'send', to: selcontacts.getSelected(), text: this.getText()});
+			}
+			return false;
 		};
 
 		ctrl.send.on('click', function(){
@@ -493,7 +496,7 @@ var controller = function (){
 			if(done){
 				setTimeout(function(){
 					main.internalTrigger({type:'sent'});
-					$.mobile.changePage('#sent', {reverse:false, changeHash:false});
+					$.mobile.changePage('#sent');
 				}, 1);
 			}
 
@@ -534,7 +537,7 @@ var controller = function (){
 	
 		var template1 = createTemplate('#sent-list');
 		var results = new Array();
-		
+
 		this.onSend = function(){
 			results = new Array();
 		}
@@ -915,20 +918,24 @@ var controller = function (){
 		}
 	}
 
+	function endsWith(str, suffix) {
+		return str.indexOf(suffix, str.length - suffix.length) !== -1;
+	}
+
 	var autoLogin = true;
 	var loginInfo;
 	
-	this.onReady = function(){
+	this.onLoad = function(){
 		if(autoLogin && localStorage && localStorage.getItem('com.briefmsg.connected') == 'ok'){
 			autoLogin = false;
 			setTimeout(function(){
 				main.internalTrigger({type:'login', login:loginInfo});
-			}, 1000);
+			}, 2000);
 		}
 	};
 	
-	$(document).on('ready', function(event){
-		main.onReady();
+	$(window).on('load', function(event){
+		main.onLoad();
 	});
 
 

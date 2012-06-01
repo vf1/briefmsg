@@ -196,9 +196,6 @@ var sipClient = function (){
 		switch (evt.e_message_type) {
 			case tsip_event_message_type_e.I_MESSAGE:
 				{
-					console.log(evt.get_message().get_content_as_string());
-					console.log(evt.get_message());
-					
 					evt.get_session().accept();
 					var uri = evt.get_session().o_uri_from;
 					client.trigger({

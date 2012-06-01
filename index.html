@@ -28,7 +28,7 @@
 			</div>
 			<div class="ui-bar ui-bar-c">
 				<div class="ui-grid-a">
-					<div class="ui-block-a" id="message-sender"></div>
+					<div class="ui-block-a wrapNoSpace" id="message-sender"></div>
 					<div class="ui-block-b"><div id="message-time" style="text-align:right;"></div></div>
 				</div>
 			</div>
@@ -174,7 +174,7 @@
 			<div data-role="footer" data-position="fixed">
 				<div data-role="navbar">
 					<ul>
-						<li><a href="#message" data-icon="arrow-r">OK</a></li>
+						<li><a href="javascript:window.history.go(-3)" data-icon="arrow-r">OK</a></li>
 					</ul>
 				</div>
 			</div>
@@ -249,7 +249,7 @@
 		
 		<div id="loginas" data-role="page">
 			<div data-role="header">
-				<a href="#start" data-rel="back" data-icon="back">Back</a>
+				<a href="#message" data-rel="back" data-icon="back">Back</a>
 				<h1>Login As</h1>
 			</div>
 			<div data-role="content">
@@ -284,7 +284,7 @@
 		
 		<div id="options" data-role="page">
 			<div data-role="header">
-				<a href="#start" data-rel="back" data-icon="back">Back</a>
+				<a href="#message" data-rel="back" data-icon="back">Back</a>
 				<h1>Options</h1>
 			</div>
 			<div data-role="content">
@@ -301,12 +301,12 @@
 
 		<div id="about" data-role="page">
 			<div data-role="header">
-				<a href="#start" data-rel="back" data-icon="back">Back</a>
+				<a href="#message" data-rel="back" data-icon="back">Back</a>
 				<h1>About</h1>
 			</div>
 			<div data-role="content">
 				<h2>BreifMsg 0.9</h2>
-				<p>Homepage: <a href="http://www.briefmsg.org">briefmsg.org</a></p>
+				<p>Homepage: <a href="http://www.briefmsg.org" target="_blank" rel="external">briefmsg.org</a></p>
 			</div>
 		</div>
 
