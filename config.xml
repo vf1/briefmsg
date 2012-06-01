@@ -6,11 +6,6 @@
     <author href="https://briefmsg.org" email="support@briefmsg.org">Vitali Fomine</author>
 
 	<icon src="images/main.gif" />
-	<gap:splash src="images/main.gif" width="32" height="32" />
-
-	<feature name="http://api.phonegap.com/1.0/contacts"/>
-	<feature name="http://api.phonegap.com/1.0/media"/>
-	<feature name="http://api.phonegap.com/1.0/network"/>
-	<feature name="http://api.phonegap.com/1.0/notification"/>
+	<gap:splash src="images/splash.png" />
 
 </widget>
