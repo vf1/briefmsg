@@ -670,7 +670,7 @@ var controller = function (){
 		
 		this.onReply = function(){
 			selcontacts.setSelected([messages[this.index].sender]);
-			editmsg.setText('>' + messages[this.index].text);
+			editmsg.setText(messages[this.index].text.replace(new RegExp('^', 'mg'), '>'));
 		}
 
 		this.onQuickReply = function(){
