@@ -975,14 +975,14 @@ var controller = function (){
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	// PhoneGap
-    function onDeviceReady() {
-        document.addEventListener('menubutton', function() { main.onMenuButton(); }, false);
-    }
-
 	this.onMenuButton = function(){
 		if(isMenuAvailable)
 			$.mobile.changePage('#menu');
 	}
+
+    function onDeviceReady() {
+        document.addEventListener('menubutton', function() { main.onMenuButton(); }, false);
+    }
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	// TASK REGISTRATION
