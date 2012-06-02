@@ -754,20 +754,34 @@ var controller = function (){
 		}
 		
 		var play = function(audioVar, src){
-			if (Audio) {
+			if (typeof Media !== 'undefined') {
 				if (!audioVar){
+					console.log('Sound: Cordova Media');
+					audioVar = new Media(src + '.mp3');
+				}
+				else{
+					audioVar.stop();
+					audioVar.seekTo(0);
+				}
+				if (audioVar)
+					audioVar.play();
+			}
+			else if (typeof Audio !== 'undefined') {
+				if (!audioVar){
+					console.log('Sound: HTML5 Audio');
 					audioVar = new Audio(src + getExtension());
 				}
 				else{
 					audioVar.pause();
 					audioVar.currentTime = 0;
 				}
-				if (audioVar){
+				if (audioVar)
 					audioVar.play();
-				}
+			}
+			else {
+				console.log('Sound: No Audio');
 			}
 		}
-		
 		
 		
 		this.onIncomingMessage = function(){
