@@ -757,7 +757,7 @@ var controller = function (){
 			if (typeof Media !== 'undefined') {
 				if (!audioVar){
 					console.log('Sound: Cordova Media');
-					audioVar = new Media(src + '.mp3', 
+					audioVar = new Media('/android_asset/www/' + src + '.mp3', 
 						function(){
 							console.debug('Cordova Media: Ok, ' + src);
 						},
