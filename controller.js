@@ -726,6 +726,31 @@ var controller = function (){
 		var outgoing;
 		var extension;
 
+		var playCordovaMedia = function(media, src){
+			if (typeof Media !== 'undefined') {
+				if (!media){
+					console.log('Sound: Cordova Media');
+					media = new Media(((device.platform.toLowerCase() == 'android') ? '/android_asset/www/' : '') + src + '.mp3', 
+						function(){
+							console.debug('Cordova Media: Ok, ' + src);
+						},
+						function(error){
+							console.error('Cordova Media: Err, ' + error.code + ', ' + error.message);
+						}
+					);
+				}
+				else{
+					media.stop();
+					media.seekTo(0);
+				}
+				if (media){
+					media.play();
+					return true;
+				}
+			}
+			return false;
+		}
+
 		var getExtension = function(){
 
 			if(typeof extension === 'undefined'){
@@ -752,44 +777,33 @@ var controller = function (){
 			
 			return extension;
 		}
+
+		var playHtml5Audio = function(audio, src){
 		
-		var play = function(audioVar, src){
-			if (typeof Media !== 'undefined') {
-				if (!audioVar){
-					console.log('Sound: Cordova Media');
-					audioVar = new Media('/android_asset/www/' + src + '.mp3', 
-						function(){
-							console.debug('Cordova Media: Ok, ' + src);
-						},
-						function(error){
-							console.error('Cordova Media: Err, ' + error.code + ', ' + error.message);
-						}
-					);
-				}
-				else{
-					audioVar.stop();
-					audioVar.seekTo(0);
-				}
-				if (audioVar)
-					audioVar.play();
-			}
-			else if (typeof Audio !== 'undefined') {
-				if (!audioVar){
+			if (typeof Audio !== 'undefined') {
+				if (!audio){
 					console.log('Sound: HTML5 Audio');
-					audioVar = new Audio(src + getExtension());
+					audio = new Audio(src + getExtension());
 				}
 				else{
-					audioVar.pause();
-					audioVar.currentTime = 0;
+					audio.pause();
+					audio.currentTime = 0;
 				}
-				if (audioVar)
-					audioVar.play();
+				if (audio){
+					audio.play();
+					return true;
+				}
 			}
-			else {
-				console.log('Sound: No Audio');
-			}
+			return false;
 		}
 		
+		var play = function(audio, src){
+			if (playCordovaMedia(audio, src) == false){
+				if(playHtml5Audio(audio, src) == false){
+					console.log('Sound: No Audio');
+				}
+			}
+		}
 		
 		this.onIncomingMessage = function(){
 			if(options.playWhenArrives)
