@@ -506,7 +506,7 @@ var controller = function (){
 	}
 
 
-	var options = new function(){
+	var optionsui = new function(){
 	
 		var form = $('#options-form');
 
@@ -527,6 +527,7 @@ var controller = function (){
 				var checkbox = $(item);
 				opt[checkbox.attr('name')] = !(typeof checkbox.attr('checked') == 'undefined');
 			});
+			options = opt;
 			main.internalTrigger({type:'optionschanged', options:opt});
 		}
 		
@@ -565,7 +566,8 @@ var controller = function (){
 		}
 
 		this.onOkBtn = function(e){
-			if(typeof initialHistoryLength !== 'undefined' && typeof history.length !== 'undefined'){
+			if(typeof initialHistoryLength !== 'undefined' && typeof history.length !== 'undefined' && history.length != initialHistoryLength){
+				console.log('history.go ' + (initialHistoryLength - history.length));
 				history.go(initialHistoryLength - history.length);
 			}
 			else{
@@ -641,6 +643,7 @@ var controller = function (){
 		this.onPageShow = function(){
 			if(typeof initialHistoryLength === 'undefined'){
 				initialHistoryLength = history.length;
+				console.log('set initialHistoryLength: ' + initialHistoryLength );
 			}
 		}
 
@@ -721,11 +724,39 @@ var controller = function (){
 
 		var incoming;
 		var outgoing;
-	
-		function play(audioVar, src){
+		var extension;
+
+		var getExtension = function(){
+
+			if(typeof extension === 'undefined'){
+			
+				var audio = new Audio();
+			
+				if(typeof audio.canPlayType === 'function'){
+					if(audio.canPlayType('audio/mpeg') !== '')
+						extension = '.mp3';
+					else if(audio.canPlayType('audio/wav') !== '')
+						extension = '.wav';
+					else {
+						console.error('No compatible audio file');
+						extension = '.mp3';
+					}
+				}
+				else{
+					console.log('Audio.canPlayType is not available');
+					extension = '.mp3';
+				}
+				
+				console.log('Audio format: ' + extension);
+			}
+			
+			return extension;
+		}
+		
+		var play = function(audioVar, src){
 			if (Audio) {
 				if (!audioVar){
-					audioVar = new Audio(src);
+					audioVar = new Audio(src + getExtension());
 				}
 				else{
 					audioVar.pause();
@@ -737,14 +768,16 @@ var controller = function (){
 			}
 		}
 		
+		
+		
 		this.onIncomingMessage = function(){
 			if(options.playWhenArrives)
-				play(incoming, 'sounds/incoming.wav');
+				play(incoming, 'sounds/incoming');
 		}
 
 		this.onSent = function(){
 			if(options.playAfterSending)
-				play(outgoing, 'sounds/outgoing.wav');
+				play(outgoing, 'sounds/outgoing');
 		}		
 	}
 	
@@ -990,7 +1023,7 @@ var controller = function (){
 	tasks.register('message', messagesui);
 	tasks.register('sending', sending);
 	tasks.register('sent', sent);
-	tasks.register('options', options);
+	tasks.register('options', optionsui);
 	tasks.register('loginas', loginas);
 	tasks.register('selcontacts', selcontacts);
 	tasks.register('quickreply', quickreply);
