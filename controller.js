@@ -1040,6 +1040,10 @@ var controller = function (){
 	$(window).on('load', function(event){
 		main.onLoad();
 	});
+
+	$(window).on('beforeunload', function(){
+		return 'If you close Brief Msg, you won\'t be able to send and recieve messages.';
+	});
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	// PhoneGap
