@@ -51,6 +51,7 @@ var controller = function (){
 	var connected = false;
 	var options;
 	var initialHistoryLength;
+	var isPhoneGap = (typeof device !== 'undefined' && device.cordova !== 'undefined');
 	
 	var findContactByUri = function(uri){
 		for(var i=0; i<contacts.length; i++)
@@ -212,10 +213,8 @@ var controller = function (){
 		
 		this.onSendBtn = function(){
 			if(ctrl.text.val().length > 0){
-				setTimeout(function(){
-					$.mobile.changePage('#sending', { changeHash: false });
-				}, 1);
-				main.internalTrigger({type: 'send', to: selcontacts.getSelected(), text: this.getText()});
+				$.mobile.changePage('#sending', { changeHash: false });
+				main.internalTrigger({type: 'send', to: selcontacts.getSelected(), text: editmsg.getText()});
 			}
 			return false;
 		};
@@ -470,20 +469,23 @@ var controller = function (){
 
 		var index = 0;
 		var total = 0;
-		var indexCtrl = $('#sending-contact-index');
-		var totalCtrl = $('#sending-contact-total');
+		
+		var ctrl = new function(){
+			this.index = $('#sending-contact-index');
+			this.total = $('#sending-contact-total');
+		}
 
 		this.update = function(){
-			indexCtrl.text(index);
-			totalCtrl.text(total);
+			ctrl.index.text(index);
+			ctrl.total.text(total);
 		}
 		
 		this.onSend = function(){
 			total = index = 0;
 			this.update();
 		}
-		
-		this.onBeforeSendOne = function(e){
+
+		this.onBeforeSendOne = function(){
 			total++;
 			this.update();
 		}
@@ -492,16 +494,13 @@ var controller = function (){
 			index++;
 			this.update();
 			
-			var done = (index >= total);
-			
-			if(done){
+			if(index >= total){
 				setTimeout(function(){
 					main.internalTrigger({type:'sent'});
+					console.log('go to #sent');
 					$.mobile.changePage('#sent');
-				}, 1);
+				}, 1000);
 			}
-
-			return done;
 		}
 	}
 
@@ -593,10 +592,32 @@ var controller = function (){
 	var messagesui = new function(){
 	
 		this.index = 0;
+
+		var NOMESSAGE = 1;
+		var VIEW1 = 2;
+		var VIEW2 = 3;
+		var state = -1;
+		
+		var GONEXT = 1;
+		var GOPREV = 2;
+		
+		var messageView = function($view){
+			
+			this.view = $view;
+			this.sender = $view.find('.message-sender').first();
+			this.time = $view.find('.message-time').first();
+			this.text = $view.find('.message-text').first();
+			
+			this.update = function(message){
+				var contact = findContactByUri(message.sender);
+				this.sender.text((typeof contact === 'undefined') ? message.sender : contact.name);
+				this.time.text(message.time.toLocaleTimeString() + ' ' + message.time.toLocaleDateString());
+				this.text.text(message.text);
+			}
+		}
 		
 		var ctrl = new function(){
 			this.page = $('#message');
-			this.message1 = $('#message1');
 			this.index = $('#messages-index');
 			this.total = $('#messages-total');
 			this.indexTotal = $('#messages-indextotal');
@@ -605,44 +626,97 @@ var controller = function (){
 			this.next = $('a.[href="#message-next"]');
 			this.prev = $('a.[href="#message-prev"]');
 			this.deletex = $('a.[href="#message-delete"]');
-			this.sender = $('#message-sender');
-			this.time = $('#message-time');
-			this.text = $('#message-text');
 			this.noMessage = $('#message-nomessages');
 			this.newMessage = $('#message a.[href="#selcontacts"]');
+			
+			this.enable = function(name, value){
+				var flagName = 'is' + name + 'Enabled';
+				if(this[flagName] == 'undefined' || this[flagName] != value){
+					enableButton(this[name], value);
+					this[flagName] = value;
+				}
+			}
 		}
 		
-		this.update = function(){
-		
+		this.update = function(animation){
+	
+			if(state < 0)
+				return;
+	
 			if(messages.length > 0){
-				ctrl.noMessage.hide();
-				var m = messages[this.index];
-				ctrl.time.text(m.time.toLocaleTimeString() + ' ' + m.time.toLocaleDateString());
-				ctrl.text.text(m.text);
-				var c = findContactByUri(m.sender);
-				ctrl.sender.text((typeof c === 'undefined') ? m.sender : c.name);
-				ctrl.indexTotal.show();
+				
+				if(state == NOMESSAGE){
+					ctrl.noMessage.hide();
+					ctrl.indexTotal.show();
+				}
+				
+				if($.isNumeric(animation)){
+				
+					var active;
+					var hidden;
+					
+					if(state == VIEW1){
+						state = VIEW2;
+						active = ctrl.message1;
+						hidden = ctrl.message2;
+					}
+					else{
+						state = VIEW1;
+						active = ctrl.message2;
+						hidden = ctrl.message1;
+					}
+
+					hidden.view.removeClass('slide in out reverse');
+					hidden.update(messages[this.index]);
+					active.view.hide();
+					hidden.view.addClass('slide in' + ((animation == GOPREV) ? ' reverse' : ''));
+					hidden.view.show();
+				}
+				else{
+					if(state == VIEW1){
+						ctrl.message1.update(messages[this.index]);
+					}
+					else if(state == VIEW2){
+						ctrl.message2.update(messages[this.index]);
+					}
+					if(state == NOMESSAGE){
+						state = VIEW1;
+						ctrl.message1.update(messages[this.index]);
+						ctrl.message1.view.show();
+					}
+				}
+
+				ctrl.index.text(this.index + 1);
+				ctrl.total.text(messages.length);
 			}
 			else{
-				ctrl.sender.html('&nbsp;');
-				ctrl.time.empty();
-				ctrl.text.empty();
-				ctrl.noMessage.show();
-				ctrl.indexTotal.hide();
+				if(state != NOMESSAGE){
+					state = NOMESSAGE;
+					ctrl.noMessage.show();
+					ctrl.indexTotal.hide();
+					ctrl.message1.view.hide();
+					ctrl.message2.view.hide();
+				}
 			}
-			
-			ctrl.index.text(this.index + 1);
-			ctrl.total.text(messages.length);
 
-			enableButton(ctrl.next, this.index < messages.length-1);
-			enableButton(ctrl.prev, this.index > 0);
-			enableButton(ctrl.quick, (messages.length > 0) && connected);
-			enableButton(ctrl.reply, (messages.length > 0) && connected);
-			enableButton(ctrl.deletex, messages.length > 0);
-			enableButton(ctrl.newMessage, connected);
+			ctrl.enable('next', this.index < messages.length-1);
+			ctrl.enable('prev', this.index > 0);
+			ctrl.enable('quick', (messages.length > 0) && connected);
+			ctrl.enable('reply', (messages.length > 0) && connected);
+			ctrl.enable('deletex', messages.length > 0);
+			ctrl.enable('newMessage', connected);
 		};
 		
+		this.onPageInit = function(){
+			ctrl['message1'] = new messageView($('div.message-view').first().hide());
+			ctrl['message2'] = new messageView(ctrl.message1.view.clone().insertAfter(ctrl.message1.view));
+			ctrl.noMessage.show();
+			ctrl.indexTotal.hide();
+			state = NOMESSAGE;
+		}
+		
 		this.onPageShow = function(){
+			this.update();
 			if(typeof initialHistoryLength === 'undefined'){
 				initialHistoryLength = history.length;
 				console.log('set initialHistoryLength: ' + initialHistoryLength );
@@ -651,27 +725,25 @@ var controller = function (){
 
 		this.onNext = function(){
 			if(this.index < messages.length-1){
-				var width = ctrl.message1.width();
-				ctrl.message1.css('position', 'absolute').width(width).animate({left: '-=100px'});
-				//this.index++;
-				//this.update();
-				//ctrl.message1.fadeIn();
+				this.index++;
+				this.update(GONEXT);
 			}
 		};
 		
 		this.onPrev = function(){
 			if(this.index > 0){
 				this.index--;
-				this.update();
+				this.update(GOPREV);
 			}
 		};
 		
 		this.onDelete = function(){
 			if(messages.length > 0){
 				messages.splice(this.index, 1);
-				if(this.index >= messages.length && messages.length > 0)
+				var goPrev = (this.index >= messages.length && messages.length > 0);
+				if(goPrev)
 					this.index = messages.length-1;
-				this.update();
+				this.update(goPrev ? GOPREV : GONEXT);
 				main.internalTrigger({type:'messageschanged', messages:messages});
 			}
 		};
@@ -688,7 +760,7 @@ var controller = function (){
 		this.onIncomingMessage = function(e){
 			messages.push(e);
 			this.index = messages.length-1;
-			this.update();
+			this.update(GONEXT);
 			main.internalTrigger({type:'messageschanged', messages:messages});
 		};
 		
@@ -723,8 +795,6 @@ var controller = function (){
 			messagesui.onQuickReply();
 			return true;
 		});
-
-		this.update();
 	};
 
 
@@ -995,7 +1065,7 @@ var controller = function (){
 	
 	this.setMessages = function(array){
 		messages = array;
-		messagesui.update();
+		//messagesui.update();
 	};
 	
 	this.setLoginInfo = function(login){
@@ -1050,9 +1120,11 @@ var controller = function (){
 		main.onLoad();
 	});
 
-	$(window).on('beforeunload', function(){
-		return 'If you close Brief Msg, you won\'t be able to send and recieve messages.';
-	});
+	if(isPhoneGap == false){
+		$(window).on('beforeunload', function(){
+			return 'If you close Brief Msg, you won\'t be able to send and recieve messages.';
+		});
+	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	// PhoneGap

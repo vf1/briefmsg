@@ -8,14 +8,31 @@ div.error {
     float: none;
 }
 
-.wrapNoSpace {
+#message-container {
+	position: relative;
+	height: 200px;
+}
+
+.message-view {
+	position: absolute;
+	top: 0px;
+	width: 100%;
+}
+
+.message-sender {
 	white-space: pre-wrap; /* css-3 */
 	white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
 	white-space: -pre-wrap; /* Opera 4-6 */
 	white-space: -o-pre-wrap; /* Opera 7 */
 	word-wrap: break-word; /* Internet Explorer 5.5+ */
+	padding-right: 1em;
 }
 
-#message-text {
+.message-time {
+	padding-left: 1em;
+	text-align: right;
+}
+
+.message-text {
 	white-space: pre;
 }

@@ -26,15 +26,19 @@
 					</ul>
 				</div>
 			</div>
-			<div class="ui-bar ui-bar-c">
-				<div class="ui-grid-a">
-					<div class="ui-block-a wrapNoSpace" id="message-sender"></div>
-					<div class="ui-block-b"><div id="message-time" style="text-align:right;"></div></div>
+			<div id="message-container">
+				<div class="message-view">
+					<div class="ui-bar ui-bar-c">
+						<div class="ui-grid-a">
+							<div class="ui-block-a"><div class="message-sender"></div></div>
+							<div class="ui-block-b"><div class="message-time"></div></div>
+						</div>
+					</div>
+					<div data-role="content">
+						<p class="message-text"></p>
+					</div>
 				</div>
-			</div>
-			<div data-role="content">
 				<div id="message-nomessages" style="text-align:center;"><h1>No Messages</h1></div>
-				<p id="message-text"></p>
 			</div>
 			<div data-role="footer" data-position="fixed">
 				<div data-role="navbar">
