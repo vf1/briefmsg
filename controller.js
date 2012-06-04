@@ -117,7 +117,7 @@ var controller = function (){
 			template1.container.listview('refresh');
 		};
 		
-		template1.container.on('click', 'li', function(f){
+		template1.container.on('vclick', 'li', function(f){
 			selcontacts.onClick($(this));
 		});
 		
@@ -220,7 +220,7 @@ var controller = function (){
 			return false;
 		};
 
-		ctrl.send.on('click', function(){
+		ctrl.send.on('vclick', function(){
 			return editmsg.onSendBtn();
 		});
 
@@ -289,11 +289,11 @@ var controller = function (){
 		
 		var that = this;
 		
-		$('#deletecontact-yes').on('click', function(f){
+		$('#deletecontact-yes').on('vclick', function(f){
 			that.onDelete();
 		});
 		
-		$('#addcontact-ok').on('click', function(f){
+		$('#addcontact-ok').on('vclick', function(f){
 			return that.onAdd();
 		});
 		
@@ -376,11 +376,11 @@ var controller = function (){
 	
 		var that = this;
 		
-		loginBtn.on('click', function(){
+		loginBtn.on('vclick', function(){
 			return that.onLogin();
 		});
 		
-		logoutBtn.on('click', function(){
+		logoutBtn.on('vclick', function(){
 			main.internalTrigger({type:'logout'});
 			return false;
 		});
@@ -422,7 +422,7 @@ var controller = function (){
 		
 		this.onPageBeforeShow = this.update;
 		
-		template1.container.on('click', 'a', function(){
+		template1.container.on('vclick', 'a', function(){
 			quickreply.onClickReply($(this).text());
 		});
 	}
@@ -456,11 +456,11 @@ var controller = function (){
 
 		this.onPageBeforeShow = this.update;
 		
-		template2.container.on('click', 'a', function(){
+		template2.container.on('vclick', 'a', function(){
 			quickreply.onRemove($(this).data('value'));
 		});
 		
-		$('#editquickreply-addbutton').on('click', function (){
+		$('#editquickreply-addbutton').on('vclick', function (){
 			quickreply.onAdd();
 		});
 	}
@@ -576,7 +576,7 @@ var controller = function (){
 			}
 		}
 		
-		ctrl.ok.on('click', function(){
+		ctrl.ok.on('vclick', function(){
 			sent.onOkBtn();
 			return false;
 		});
@@ -595,6 +595,8 @@ var controller = function (){
 		this.index = 0;
 		
 		var ctrl = new function(){
+			this.page = $('#message');
+			this.message1 = $('#message1');
 			this.index = $('#messages-index');
 			this.total = $('#messages-total');
 			this.indexTotal = $('#messages-indextotal');
@@ -649,8 +651,11 @@ var controller = function (){
 
 		this.onNext = function(){
 			if(this.index < messages.length-1){
-				this.index++;
-				this.update();
+				var width = ctrl.message1.width();
+				ctrl.message1.css('position', 'absolute').width(width).animate({left: '-=100px'});
+				//this.index++;
+				//this.update();
+				//ctrl.message1.fadeIn();
 			}
 		};
 		
@@ -690,27 +695,31 @@ var controller = function (){
 		this.onConnected = this.update;
 		this.onDisconnected = this.update;
 		
-		ctrl.next.on('click', function(){
+		var nextShim = function(){
 			messagesui.onNext();
 			return false;
-		});
+		}
+		ctrl.next.on('vclick', nextShim);
+		ctrl.page.on('swipeleft', nextShim);
 
-		ctrl.prev.on('click', function(){
+		var prevShim = function(){
 			messagesui.onPrev()
 			return false;
-		});
+		}
+		ctrl.prev.on('vclick', prevShim);
+		ctrl.page.on('swiperight', prevShim);
 		
-		ctrl.deletex.on('click', function(){
+		ctrl.deletex.on('vclick', function(){
 			messagesui.onDelete();
 			return false;
 		});
 		
-		ctrl.reply.on('click', function(){
+		ctrl.reply.on('vclick', function(){
 			messagesui.onReply();
 			return true;
 		});
 
-		ctrl.quick.on('click', function(){
+		ctrl.quick.on('vclick', function(){
 			messagesui.onQuickReply();
 			return true;
 		});
