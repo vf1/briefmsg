@@ -51,7 +51,7 @@ var controller = function (){
 	var connected = false;
 	var options;
 	var initialHistoryLength;
-	var isPhoneGap = (typeof device !== 'undefined' && device.cordova !== 'undefined');
+	var isPhonegap = (typeof cordova !== 'undefined');
 	
 	var findContactByUri = function(uri){
 		for(var i=0; i<contacts.length; i++)
@@ -118,7 +118,7 @@ var controller = function (){
 			template1.container.listview('refresh');
 		};
 		
-		template1.container.on('vclick', 'li', function(f){
+		template1.container.on('click', 'li', function(f){
 			selcontacts.onClick($(this));
 		});
 		
@@ -219,7 +219,7 @@ var controller = function (){
 			return false;
 		};
 
-		ctrl.send.on('vclick', function(){
+		ctrl.send.on('click', function(){
 			return editmsg.onSendBtn();
 		});
 
@@ -288,11 +288,11 @@ var controller = function (){
 		
 		var that = this;
 		
-		$('#deletecontact-yes').on('vclick', function(f){
+		$('#deletecontact-yes').on('click', function(f){
 			that.onDelete();
 		});
 		
-		$('#addcontact-ok').on('vclick', function(f){
+		$('#addcontact-ok').on('click', function(f){
 			return that.onAdd();
 		});
 		
@@ -375,11 +375,11 @@ var controller = function (){
 	
 		var that = this;
 		
-		loginBtn.on('vclick', function(){
+		loginBtn.on('click', function(){
 			return that.onLogin();
 		});
 		
-		logoutBtn.on('vclick', function(){
+		logoutBtn.on('click', function(){
 			main.internalTrigger({type:'logout'});
 			return false;
 		});
@@ -421,7 +421,7 @@ var controller = function (){
 		
 		this.onPageBeforeShow = this.update;
 		
-		template1.container.on('vclick', 'a', function(){
+		template1.container.on('click', 'a', function(){
 			quickreply.onClickReply($(this).text());
 		});
 	}
@@ -455,11 +455,11 @@ var controller = function (){
 
 		this.onPageBeforeShow = this.update;
 		
-		template2.container.on('vclick', 'a', function(){
+		template2.container.on('click', 'a', function(){
 			quickreply.onRemove($(this).data('value'));
 		});
 		
-		$('#editquickreply-addbutton').on('vclick', function (){
+		$('#editquickreply-addbutton').on('click', function (){
 			quickreply.onAdd();
 		});
 	}
@@ -781,17 +781,17 @@ var controller = function (){
 		ctrl.prev.on('vclick', prevShim);
 		ctrl.page.on('swiperight', prevShim);
 		
-		ctrl.deletex.on('vclick', function(){
+		ctrl.deletex.on('click', function(){
 			messagesui.onDelete();
 			return false;
 		});
 		
-		ctrl.reply.on('vclick', function(){
+		ctrl.reply.on('click', function(){
 			messagesui.onReply();
 			return true;
 		});
 
-		ctrl.quick.on('vclick', function(){
+		ctrl.quick.on('click', function(){
 			messagesui.onQuickReply();
 			return true;
 		});
@@ -1065,7 +1065,6 @@ var controller = function (){
 	
 	this.setMessages = function(array){
 		messages = array;
-		//messagesui.update();
 	};
 	
 	this.setLoginInfo = function(login){
@@ -1120,7 +1119,7 @@ var controller = function (){
 		main.onLoad();
 	});
 
-	if(isPhoneGap == false){
+	if(isPhonegap == false){
 		$(window).on('beforeunload', function(){
 			return 'If you close Brief Msg, you won\'t be able to send and recieve messages.';
 		});
