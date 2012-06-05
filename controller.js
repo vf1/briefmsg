@@ -806,6 +806,9 @@ var controller = function (){
 		var extension;
 
 		var playCordovaMedia = function(media, src){
+			if(isPhonegap){
+				navigator.notification.beep(1);
+			}
 			if (typeof Media !== 'undefined') {
 				if (!media){
 					console.log('Sound: Cordova Media');

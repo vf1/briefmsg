@@ -198,7 +198,7 @@ var sipClient = function (){
 				{
 					evt.get_session().accept();
 					var uri = evt.get_session().o_uri_from;
-					client.trigger({
+					client.triggerAsync({
 						type: 'incomingmessage',
 						sender: uri.s_scheme + ':' + uri.s_user_name + '@' + uri.s_host,
 						time: new Date(),
@@ -239,5 +239,10 @@ var sipClient = function (){
 	this.trigger = function(event){
 		for (var i=0; i<this.handlers.length; i++)
 			this.handlers[i](event);
+	};
+
+	this.triggerAsync = function(event){
+		var obj = this;
+		setTimeout(function() { obj.trigger(event); }, 100);
 	};
 }
