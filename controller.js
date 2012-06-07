@@ -205,6 +205,7 @@ var controller = function (){
 		
 		this.onPageShow = function(){
 			timer = setInterval(this.updateControls, 1000);
+			ctrl.text.focusEnd();
 		}
 		
 		this.onPageHide = function(){
@@ -225,6 +226,11 @@ var controller = function (){
 
 		ctrl.text.on('keyup', function(){
 			editmsg.updateControls();
+		});
+
+		ctrl.text.on('keypress', function(event){
+			if (event.keyCode == 13)
+				event.preventDefault();
 		});
 	}	
 	
@@ -566,8 +572,9 @@ var controller = function (){
 
 		this.onOkBtn = function(e){
 			if(typeof initialHistoryLength !== 'undefined' && typeof history.length !== 'undefined' && history.length != initialHistoryLength){
-				console.log('history.go ' + (initialHistoryLength - history.length));
-				history.go(initialHistoryLength - history.length);
+				var offset = initialHistoryLength - history.length;
+				console.log('history.go ' + offset);
+				history.go(offset);
 			}
 			else{
 				console.log('Do not know initialHistoryLength, go to #message');
@@ -575,7 +582,7 @@ var controller = function (){
 			}
 		}
 		
-		ctrl.ok.on('vclick', function(){
+		ctrl.ok.on('click', function(){
 			sent.onOkBtn();
 			return false;
 		});
@@ -612,7 +619,8 @@ var controller = function (){
 				var contact = findContactByUri(message.sender);
 				this.sender.text((typeof contact === 'undefined') ? message.sender : contact.name);
 				this.time.text(message.time.toLocaleTimeString() + ' ' + message.time.toLocaleDateString());
-				this.text.text(message.text);
+				//this.text.text(message.text);
+				this.text.html(message.text.split('\n').join('<br/>'));
 			}
 		}
 		
@@ -707,6 +715,11 @@ var controller = function (){
 			ctrl.enable('newMessage', connected);
 		};
 		
+		this.onPageHide = function(){
+			ctrl.message1.view.removeClass('slide in out reverse');
+			ctrl.message2.view.removeClass('slide in out reverse');
+		}
+		
 		this.onPageInit = function(){
 			ctrl['message1'] = new messageView($('div.message-view').first().hide());
 			ctrl['message2'] = new messageView(ctrl.message1.view.clone().insertAfter(ctrl.message1.view));
@@ -750,7 +763,14 @@ var controller = function (){
 		
 		this.onReply = function(){
 			selcontacts.setSelected([messages[this.index].sender]);
-			editmsg.setText(messages[this.index].text.replace(new RegExp('^', 'mg'), '>'));
+			//editmsg.setText(messages[this.index].text.replace(new RegExp('^', 'mg'), '>') + '\n');
+			var text = messages[this.index].text;
+			var index = text.lastIndexOf('\n');
+			if(index > 0)
+				text = text.substring(index + 1);
+			if(text.length > 0)
+				text = '>' + text + '\n';
+			editmsg.setText(text);
 		}
 
 		this.onQuickReply = function(){
@@ -806,9 +826,9 @@ var controller = function (){
 		var extension;
 
 		var playCordovaMedia = function(media, src){
-			if(isPhonegap){
-				navigator.notification.beep(1);
-			}
+			//if(isPhonegap){
+			//	navigator.notification.beep(1);
+			//}
 			if (typeof Media !== 'undefined') {
 				if (!media){
 					console.log('Sound: Cordova Media');
@@ -1078,8 +1098,7 @@ var controller = function (){
 	
 	this.onConnected = function(){
 		connected = true;
-		if(localStorage)
-			localStorage.setItem('com.briefmsg.connected', 'ok');
+		this.setItem('connected', 'yes');
 	};
 	
 	this.onDisconnected = function(){
@@ -1103,12 +1122,10 @@ var controller = function (){
 		return str.indexOf(suffix, str.length - suffix.length) !== -1;
 	}
 
-	var autoLogin = true;
 	var loginInfo;
 	
 	this.onLoad = function(){
-		if(autoLogin && localStorage && localStorage.getItem('com.briefmsg.connected') == 'ok'){
-			autoLogin = false;
+		if(this.getItem('connected') == 'yes'){
 			setTimeout(function(){
 				main.internalTrigger({type:'login', login:loginInfo});
 			}, 2000);

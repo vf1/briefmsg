@@ -34,8 +34,7 @@ var sipClient = function (){
 		try{
 			oSipStack = new tsip_stack(realm, username, 'sip:' + username + '@' + realm, proxyAddr, proxyPort,
 								tsip_stack.prototype.SetPassword(password),
-								tsip_stack.prototype.SetHeader('User-Agent', 'OfficeSIP Toast'),
-								tsip_stack.prototype.SetHeader('Organization', 'OfficeSIP'));
+								tsip_stack.prototype.SetHeader('User-Agent', 'briefmsg'));
 
 			oSipStack.on_event_stack = onSipEventStack;
 			oSipStack.on_event_dialog = onSipEventDialog;
@@ -96,10 +95,7 @@ var sipClient = function (){
 					try{
                     // LogIn (REGISTER) as soon as the stack finish starting
                     oSipSessionRegister = new tsip_session_register(oSipStack,
-                                            tsip_session.prototype.SetExpires(200));//,
-                                            //tsip_session.prototype.SetCaps("+g.oma.sip-im"),
-                                            //tsip_session.prototype.SetCaps("+audio"),
-                                            //tsip_session.prototype.SetCaps("language", "\"en,fr\""));
+                                            tsip_session.prototype.SetExpires(200));
                     oSipSessionRegister.register();
                     break;
 					}
@@ -198,7 +194,7 @@ var sipClient = function (){
 				{
 					evt.get_session().accept();
 					var uri = evt.get_session().o_uri_from;
-					client.triggerAsync({
+					client.trigger({
 						type: 'incomingmessage',
 						sender: uri.s_scheme + ':' + uri.s_user_name + '@' + uri.s_host,
 						time: new Date(),

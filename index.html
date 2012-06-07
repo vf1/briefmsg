@@ -106,7 +106,7 @@
 
 		<div id="selcontacts" data-role="page">
 			<div data-role="header" data-position="fixed">
-				<a href="#messages" data-rel="back" data-icon="back">Back</a>
+				<a href="#message" data-rel="back" data-icon="back">Back</a>
 				<h1>Select Contacts</h1>
 			</div>
 			<div data-role="content">
@@ -131,7 +131,7 @@
 				
 		<div id="editmessage" data-role="page">
 			<div data-role="header">
-				<a href="#messages" data-rel="back" data-icon="back">Back</a>
+				<a href="#message" data-rel="back" data-icon="back">Back</a>
 				<h1>Text of Message</h1>
 			</div>
 			<div data-role="content">
@@ -186,7 +186,7 @@
 
 		<div id="contacts" data-role="page">
 			<div data-role="header" data-position="fixed">
-				<a href="#messages" data-rel="back" data-icon="back">Back</a>
+				<a href="#message" data-rel="back" data-icon="back">Back</a>
 				<h1>Edit Contacts</h1>
 			</div>
 			<div data-role="content">
@@ -252,7 +252,7 @@
 
 		
 		<div id="loginas" data-role="page">
-			<div data-role="header">
+			<div data-role="header" data-position="fixed">
 				<a href="#message" data-rel="back" data-icon="back">Back</a>
 				<h1>Login As</h1>
 			</div>
@@ -297,7 +297,6 @@
 					<label for="options-play-o"><input type="checkbox" id="options-play-o" name="playAfterSending" value="true"></input>Play a sound after sending message</label>
 				</form>
 				<!--
-				<label for="options-delete"><input type="checkbox" id="options-delete"></input>Minimize to tray after sending a message</label>
 				<label for="options-delete"><input type="checkbox" id="options-delete"></input>Delete message on reply</label>
 				-->
 			</div>
@@ -330,85 +329,143 @@
 		<script src="assets/jquery.validate.min.js"></script>
 		<script src="assets/jquery.mobile.toast.min.js"></script>
 		<script src="assets/jquery.officesipWebSocket.js"></script>
+		<script src="assets/jquery.helpers.js"></script>
 		<script src="assets/handlebars-1.0.0.beta.6.js"></script>
 		<script src="assets/typedarray.js"></script>
-		
+		<script src="assets/browserDetect.js"></script>
+
 		<script src="controller.js"></script>
 		<script src="src/tinySIP/src/tsip_api.js"></script>
 		<script src="sipclient.js"></script>
+		<script src="sipdemoclient.js"></script>
 		<script src="debug.js"></script>
 		
 		<script type="text/javascript">
 		(function (){
 		
-			function loadJsonedObject(key, defaultValue){
-				var jsoned;
-				if(localStorage)
-					jsoned = localStorage.getItem(key);
-				return (jsoned == undefined) ? defaultValue : JSON.parse(jsoned);
-			}
+			var params = $.getUrlVars();
+			var isDemo = parseInt(params['demo']) > 0;
 			
-			function saveJsonedObject(key, value){
-				localStorage.setItem(key, JSON.stringify(value));
-			}
-			
-			function loadMessages(){
-				var messages = loadJsonedObject('com.briefmsg.messages', []);
-				for(var i=0; i<messages.length; i++)
-					messages[i].time = new Date(messages[i].time);
-				return messages;
-			}
-			
-			function saveMessages(messages){
-				saveJsonedObject('com.briefmsg.messages', messages);
-			}
-			
-			function loadLoginInfo(){
-				return loadJsonedObject('com.briefmsg.login', {domain:'officesip.local'});
+			if(isDemo && BrowserDetect.browser != 'Chrome'){
+				$('a.[data-rel="back"]').removeAttr('data-rel');
 			}
 		
 			var ui = new controller();
-			var sip = new sipClient();
 			
-			ui.setOptions(loadJsonedObject('com.briefmsg.options', {playWhenArrives:true, playAfterSending:false}))
-			ui.setLoginInfo(loadLoginInfo());
-			ui.setContacts(loadJsonedObject('com.briefmsg.contacts', []));
-			ui.setMessages(loadMessages());
-			ui.setQuickReplies(loadJsonedObject('com.briefmsg.quicks',
-				['Thank you!', 'Sorry, I am busy', 'Wait a moment...', 'OK', 'Yes', 'No', 'Ask them to leave a message',
-				'Tell them to call me back', 'I will call them back', 'Yes, I know']));
-			
-			
-			ui.on('optionschanged', function(e) {
-				saveJsonedObject('com.briefmsg.options', e.options);
-			});
-			
-			ui.on('messageschanged', function(e) {
-				saveMessages(e.messages);
-			});
+			if(isDemo){
+				var sip = new sipDemoClient();
 
-			ui.on('quickreplieschanged', function(e) {
-				saveJsonedObject('com.briefmsg.quicks', e.quicks);
-			});
-			
-			ui.on('contactschanged', function(e) {
-				saveJsonedObject('com.briefmsg.contacts', e.contacts);
-			});
-			
-			ui.on('login', function(e) {
-				saveJsonedObject('com.briefmsg.login', e.login);
-				sip.register(e.login.name, e.login.domain, e.login.password, e.login.proxy);
-			});
+				ui.setOptions({playWhenArrives:true, playAfterSending:false});
+				ui.setLoginInfo({name:'user', password:'pass', domain:'officesip.local', proxy:'192.168.1.1:5060'});
+				ui.setContacts([
+					{ status: 'online', name: 'Brian Kernighan', uri: 'sip:kernighan@officesip.local' },
+					{ status: 'online', name: 'Bjarne Stroustrup', uri: 'sip:stroustrup@officesip.local' },
+					{ status: 'online', name: 'Alexander Stepanov', uri: 'sip:stepanov@officesip.local' },
+					{ status: 'online', name: 'Donald Knuth', uri: 'sip:knuth@officesip.local' },
+					{ status: 'online', name: 'Dennis Ritchie', uri: 'sip:ritchie@officesip.local' },
+					{ status: 'online', name: 'Niklaus Wirth', uri: 'sip:wirth@officesip.local' },
+					{ status: 'offline', name: 'Charles Babbage', uri: 'sip:babbage@officesip.local' }
+				]);
+				ui.setMessages([
+					{ sender: 'sip:ritchie@officesip.local', time: new Date(), text: "Ritchie was best known as the creator of the C programming language, a key developer of the Unix operating system, and co-author of the book The C Programming Language, and was the 'R' in K&R (a common reference to the book's authors Kernighan and Ritchie). Ritchie worked together with Ken Thompson, the scientist credited with writing the original Unix; one of Ritchie's most important contributions to Unix was its porting to different machines and platforms."},
+					{ sender: 'sip:kernighan@officesip.local', time: new Date(), text: "Kernighan's name became widely known through co-authorship of the first book on the C programming language with Dennis Ritchie."},
+					{ sender: 'sip:stepanov@officesip.local', time: new Date(), text: "Alexander Alexandrovich Stepanov (born November 16, 1950 in Moscow) is the primary designer and implementer of the C++ Standard Template Library, which he started to develop around 1992 while employed at HP Labs."},
+					{ sender: 'sip:knuth@officesip.local', time: new Date(), text: "He is the author of the seminal multi-volume work The Art of Computer Programming. Knuth has been called the 'father' of the analysis of algorithms. "},
+					{ sender: 'sip:stroustrup@officesip.local', time: new Date(), text: "Bjarne Stroustrup is a Danish computer scientist, most notable for the creation and the development of the widely used C++ programming language"},
+					{ sender: 'sip:wirth@officesip.local', time: new Date(), text: "Niklaus Emil Wirth (born February 15, 1934) is a Swiss computer scientist, best known for designing several programming languages, including Pascal, and for pioneering several classic topics in software engineering"}
+				]);
+				ui.setQuickReplies(['Thank you!', 'Sorry, I am busy', 'Wait a moment...', 'OK', 'Yes', 'No', 'Ask them to leave a message',
+					'Tell them to call me back', 'I will call them back', 'Yes, I know']);
+				
+				ui.on('login', sip.register);
+				ui.on('logout', sip.unRegister);
+				ui.on('send', function(e) { sip.send(e.to, e.text); });
 
-			ui.on('send', function(e) {
-				sip.send(e.to, e.text);
-			});
-
-			ui.on('logout', sip.unRegister);
+				ui.setItem = function() {};
+				ui.getItem = function(shortName) {
+					if(shortName == 'connected')
+						return 'yes';
+				}
+				
+				sip.onAny(ui.trigger);
+			}
+			else{
+				var sip = new sipClient();
+		
+				function loadJsonedObject(key, defaultValue){
+					var jsoned;
+					if(localStorage)
+						jsoned = localStorage.getItem(key);
+					return (jsoned == undefined) ? defaultValue : JSON.parse(jsoned);
+				}
+				
+				function saveJsonedObject(key, value){
+					localStorage.setItem(key, JSON.stringify(value));
+				}
+				
+				function loadMessages(){
+					var messages = loadJsonedObject('com.briefmsg.messages', []);
+					for(var i=0; i<messages.length; i++)
+						messages[i].time = new Date(messages[i].time);
+					return messages;
+				}
+				
+				function saveMessages(messages){
+					saveJsonedObject('com.briefmsg.messages', messages);
+				}
+				
+				function loadLoginInfo(){
+					return loadJsonedObject('com.briefmsg.login', {domain:'officesip.local'});
+				}
+				
+				ui.setOptions(loadJsonedObject('com.briefmsg.options', {playWhenArrives:true, playAfterSending:false}));
+				ui.setLoginInfo(loadLoginInfo());
+				ui.setContacts(loadJsonedObject('com.briefmsg.contacts', []));
+				ui.setMessages(loadMessages());
+				ui.setQuickReplies(loadJsonedObject('com.briefmsg.quicks',
+					['Thank you!', 'Sorry, I am busy', 'Wait a moment...', 'OK', 'Yes', 'No', 'Ask them to leave a message',
+					'Tell them to call me back', 'I will call them back', 'Yes, I know']));
 			
-			sip.onAny(ui.trigger);
 
-			console.log("js - ok!");
+				ui.setItem = function(shortName, value) {
+					if(localStorage)
+						localStorage.setItem('com.briefmsg.' + shortName, value);
+				}
+
+				ui.getItem = function(shortName) {
+					if(localStorage)
+						return localStorage.getItem('com.briefmsg.' + shortName);
+				}
+			
+				ui.on('optionschanged', function(e) {
+					saveJsonedObject('com.briefmsg.options', e.options);
+				});
+				
+				ui.on('messageschanged', function(e) {
+					saveMessages(e.messages);
+				});
+
+				ui.on('quickreplieschanged', function(e) {
+					saveJsonedObject('com.briefmsg.quicks', e.quicks);
+				});
+				
+				ui.on('contactschanged', function(e) {
+					saveJsonedObject('com.briefmsg.contacts', e.contacts);
+				});
+
+				ui.on('login', function(e) {
+					saveJsonedObject('com.briefmsg.login', e.login);
+					sip.register(e.login.name, e.login.domain, e.login.password, e.login.proxy);
+				});
+
+				ui.on('logout', sip.unRegister);
+
+				ui.on('send', function(e) {
+					sip.send(e.to, e.text);
+				});
+
+				sip.onAny(ui.trigger);
+			};
 		})();
 		
 		</script>
