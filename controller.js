@@ -1,5 +1,5 @@
 
-var controller = function (){
+var controller = function(isDemo) {
 
 	var enableButton = function(button, enable){
 		if(enable)
@@ -571,7 +571,7 @@ var controller = function (){
 		}
 
 		this.onOkBtn = function(e){
-			if(typeof initialHistoryLength !== 'undefined' && typeof history.length !== 'undefined' && history.length != initialHistoryLength){
+			if(typeof initialHistoryLength !== 'undefined' && typeof history.length !== 'undefined' && history.length != initialHistoryLength && isDemo == false){
 				var offset = initialHistoryLength - history.length;
 				console.log('history.go ' + offset);
 				history.go(offset);
@@ -1139,7 +1139,7 @@ var controller = function (){
 		main.onLoad();
 	});
 
-	if(isPhonegap == false){
+	if(isPhonegap == false && isDemo != true){
 		$(window).on('beforeunload', function(){
 			return 'If you close Brief Msg, you won\'t be able to send and recieve messages.';
 		});

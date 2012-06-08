@@ -350,10 +350,10 @@
 				$('a.[data-rel="back"]').removeAttr('data-rel');
 			}
 		
-			var ui = new controller();
+			var ui = new controller(isDemo);
 			
 			if(isDemo){
-				var sip = new sipDemoClient();
+				var sip = window.sipDemo = new sipDemoClient();
 
 				ui.setOptions({playWhenArrives:true, playAfterSending:false});
 				ui.setLoginInfo({name:'user', password:'pass', domain:'officesip.local', proxy:'192.168.1.1:5060'});
@@ -367,7 +367,7 @@
 					{ status: 'offline', name: 'Charles Babbage', uri: 'sip:babbage@officesip.local' }
 				]);
 				ui.setMessages([
-					{ sender: 'sip:ritchie@officesip.local', time: new Date(), text: "Ritchie was best known as the creator of the C programming language, a key developer of the Unix operating system, and co-author of the book The C Programming Language, and was the 'R' in K&R (a common reference to the book's authors Kernighan and Ritchie). Ritchie worked together with Ken Thompson, the scientist credited with writing the original Unix; one of Ritchie's most important contributions to Unix was its porting to different machines and platforms."},
+					{ sender: 'sip:ritchie@officesip.local', time: new Date(), text: "Ritchie was best known as the creator of the C programming language, a key developer of the Unix operating system, and co-author of the book The C Programming Language, and was the 'R' in K&R."},
 					{ sender: 'sip:kernighan@officesip.local', time: new Date(), text: "Kernighan's name became widely known through co-authorship of the first book on the C programming language with Dennis Ritchie."},
 					{ sender: 'sip:stepanov@officesip.local', time: new Date(), text: "Alexander Alexandrovich Stepanov (born November 16, 1950 in Moscow) is the primary designer and implementer of the C++ Standard Template Library, which he started to develop around 1992 while employed at HP Labs."},
 					{ sender: 'sip:knuth@officesip.local', time: new Date(), text: "He is the author of the seminal multi-volume work The Art of Computer Programming. Knuth has been called the 'father' of the analysis of algorithms. "},
@@ -467,6 +467,10 @@
 				sip.onAny(ui.trigger);
 			};
 		})();
+		
+		window.emulateIncomingMessage = function(sender, text) {
+			sipDemo.emulateIncomingMessage(sender, text);
+		}
 		
 		</script>
 	</body>
