@@ -3,7 +3,7 @@
     <head>
 		<meta name="viewport" content="user-scalable=no, width=device-width" />
 		<meta name="viewport" content="initial-scale=1.0; maximum-scale=1.0;">
-		<link rel="stylesheet" href="assets/jquery.mobile-1.1.0.min.css" />
+		<link rel="stylesheet" href="assets/jquery.mobile-1.2.0.min.css" />
 		<link rel="stylesheet" href="assets/jquery.mobile.toast.min.css" /> 
 		<link rel="stylesheet" href="screen.css" />
 		<title>Brief Msg</title>
@@ -40,27 +40,21 @@
 					</div>
 				</div>
 				<div id="message-nomessages" style="text-align:center;"><h1>No Messages</h1></div>
+				<div id="menu" data-role="popup" data-position-to="window">
+						<ul data-role="listview" data-inset="true" data-theme="a" id="menu-listview">
+							<li><a href="#loginas">Account</a></li>
+							<li><a href="#contacts">Contacts</a></li>
+							<li><a href="#options">Options</a></li>
+							<li><a href="#about">About</a></li>
+						</ul>
+				</div>
 			</div>
 			<div data-role="footer" data-position="fixed">
 				<div data-role="navbar">
 					<ul>
 						<li><a href="#selcontacts" data-icon="star">New Message</a></li>
-						<li><a href="#menu">Menu</a></li>
+						<li><a href="#menu" data-rel="popup">Menu</a></li>
 					</ul>
-				</div>
-			</div>
-		</div>
-
-		<div id="menu" data-role="dialog">
-			<div data-role="header">
-				<h1>&nbsp;</h1>
-			</div>
-			<div data-role="content">
-				<div data-role="controlgroup">
-					<a href="#loginas" data-role="button">Account</a>
-					<a href="#contacts" data-role="button">Contacts</a>
-					<a href="#options" data-role="button">Options</a>
-					<a href="#about" data-role="button">About</a>
 				</div>
 			</div>
 		</div>
@@ -324,9 +318,17 @@
 			</div>
 		</script>
 		
+		<script src="assets/md5.js"></script>
+		<script src="assets/digest.authentication.js"></script>
+		<script type="text/javascript">
+		(function (){
+			DigestAuthentication.registerInterface();
+		})();
+		</script>
+
 		<script src="cordova-1.7.0.js"></script>
-		<script src="assets/jquery-1.7.1.min.js"></script>
-		<script src="assets/jquery.mobile-1.1.0.min.js"></script>
+		<script src="assets/jquery-1.7.2.min.js"></script>
+		<script src="assets/jquery.mobile-1.2.0.min.js"></script>
 		<script src="assets/jquery.validate.min.js"></script>
 		<script src="assets/jquery.mobile.toast.min.js"></script>
 		<script src="assets/jquery.officesipWebSocket.js"></script>
@@ -335,6 +337,7 @@
 		<script src="assets/typedarray.js"></script>
 		<script src="assets/browserDetect.js"></script>
 
+		<script src="xcapclient.js"></script>
 		<script src="controller.js"></script>
 		<script src="src/tinySIP/src/tsip_api.js"></script>
 		<script src="sipclient.js"></script>
@@ -392,6 +395,7 @@
 			}
 			else{
 				var sip = new sipClient();
+				var xcap = new xcapClient();
 		
 				function loadJsonedObject(key, defaultValue){
 					var jsoned;
@@ -457,6 +461,8 @@
 				ui.on('login', function(e) {
 					saveJsonedObject('com.briefmsg.login', e.login);
 					sip.register(e.login.name, e.login.domain, e.login.password, e.login.proxy);
+					var server = (typeof e.login.proxy !== 'undefined') ? e.login.proxy : e.login.domain;
+					xcap.initialize(server, 'sip:briefmsg@officesip.local', e.login.name, e.login.password);
 				});
 
 				ui.on('logout', sip.unRegister);
@@ -465,7 +471,12 @@
 					sip.send(e.to, e.text);
 				});
 
+				ui.on('get-xcap-contacts', function() {
+					xcap.getContacts();
+				});
+
 				sip.onAny(ui.trigger);
+				xcap.onAny(ui.trigger);
 			};
 		})();
 		

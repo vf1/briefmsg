@@ -92,7 +92,11 @@ var controller = function(isDemo) {
 		this.onPageBeforeShow = function(){
 
 			createContacts();
-		
+			this.refreshListview();
+		};
+
+		this.refreshListview = function(){
+
 			template1.empty();
 			for(var i=0; i<allContacts.length; i++){
 				if(selected[i])
@@ -100,8 +104,31 @@ var controller = function(isDemo) {
 				else
 					template1.append({contact:allContacts[i], index:i});
 			}
-			template1.container.listview('refresh');
-		};
+			template1.container.listview('refresh');			
+		}
+
+		this.onXcapDone = function(event){
+			console.log(event);
+			$.mobile.loading('hide');
+
+			allContacts = allContacts.concat(event.contacts).sort();
+
+			this.refreshListview();
+		}
+
+		this.onXcapError = function(){
+			$.mobile.loading('hide');
+		}
+
+		this.onPageShow = function(){
+			$.mobile.loading('show', { text:'Loading contacts...', textVisible: true });
+
+			main.internalTrigger({ type:'get-xcap-contacts' });
+
+			// setTimeout(function() {
+			// 	$.mobile.loading('hide');				
+			// }, 12000);
+		}
 
 		this.clear = function(){
 			selected = [];
@@ -1024,7 +1051,7 @@ var controller = function(isDemo) {
 		var pageInitEvents = ['onPageBeforeCreate', 'onPageCreate', 'onPageInit'];
 		var genericEvents = ['onSend', 'onBeforeSendOne', 'onSentOne', 'onSent',
 			'onConnecting', 'onConnected', 'onDisconnecting', 'onDisconnected', 'onConnectError',
-			'onIncomingMessage'];
+			'onIncomingMessage', 'onXcapDone', 'onXcapError'];
 			
 		var pageEventTypes = $.map(pageEvents, function(value, index){
 			return value.substring(2).toLowerCase();
@@ -1149,7 +1176,7 @@ var controller = function(isDemo) {
 	// PhoneGap
 	this.onMenuButton = function(){
 		if(isMenuAvailable)
-			$.mobile.changePage('#menu');
+			$.mobile.popup('#menu');
 	}
 
     function onDeviceReady() {

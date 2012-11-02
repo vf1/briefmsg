@@ -36,3 +36,7 @@ div.error {
 .message-text {
 //	white-space: pre;
 }
+
+#menu-listview {
+	min-width: 12em;
+}
