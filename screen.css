@@ -40,3 +40,29 @@ div.error {
 #menu-listview {
 	min-width: 12em;
 }
+
+.contact-status {
+	width: 0.8em;
+	height: 0.8em;
+	background-color: #f0f0f0;
+	display: inline-block;
+	margin-right: 0.5em;
+	border: 1px solid #bbb;
+	border-radius: 4px;
+}
+
+.contact-online {
+	background-color: #99FF99;
+}
+
+.contact-offline {
+	background-color: #FFCCCC;
+}
+
+.contact-away {
+	background-color: #FFFF99;
+}
+
+.contact-busy {
+	background-color: #FFCC66;
+}

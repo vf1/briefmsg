@@ -9,8 +9,12 @@ var xcapClient = function (){
 	this.isReady = false;
 	this.hasResourceLists = false;
 	this.hasRlsServices = false;
+	this.hasPidfManipulation = false;
 	this.isUpdating = false;
 	this.contacts = [];
+	this.pidfIndex = 0;
+
+	//------------------------------------------------------------------------------------------
 
 	this.initialize = function(server, uri, username, password) {
 
@@ -24,26 +28,11 @@ var xcapClient = function (){
 		this.getXcapCaps();
 	}
 
-	this.getContacts = function(uri) {
-
-		if(this.isReady == false){
-
-			this.trigger({ type:'xcaperror' });
-		}
-		else {
-
-			this.isUpdating = true;
-
-			this.contacts = [];
-
-			if(this.hasResourceLists)
-				this.getResourceUsers();
-		}
-	}
-
 	this.getBaseUrl = function(server) {
 		return 'http://' + server + '/xcap-root';
 	}
+
+	//------------------------------------------------------------------------------------------
 
 	this.getXcapCaps = function() {
 
@@ -67,9 +56,34 @@ var xcapClient = function (){
 				case 'rls-services':
 					this.hasRlsServices = true;
 					break;
+				case 'pidf-manipulation':
+					this.hasPidfManipulation = true;
+					break;
 			}
 		}
 	}
+
+	//------------------------------------------------------------------------------------------
+
+	this.startUpdate = function(uri) {
+
+		if(this.isReady == false){
+
+			this.trigger({ type:'xcaperror' });
+		}
+		else {
+
+			this.isUpdating = true;
+
+			this.contacts = [];
+			this.pidfIndex = 0;
+
+			if(this.hasResourceLists)
+				this.getResourceUsers();
+		}
+	}
+
+	//------------------------------------------------------------------------------------------
 
 	this.getResourceUsers = function() {
 
@@ -82,11 +96,11 @@ var xcapClient = function (){
 	this.onGetResourceUsers = function(xml) {
 
 		this.processResourceUsers(xml);
-	
-		if(this.hasRlsServices)
-			this.getRlsServices();
-		else
-			this.finished();
+
+		this.trigger({ type:'xcapdone', contacts:this.contacts });
+
+		if(this.hasPidfManipulation)
+			this.getPidf();
 	}
 
 	this.processResourceUsers = function(xml) {
@@ -111,23 +125,107 @@ var xcapClient = function (){
 		};
 	}
 
-	this.getRlsServices = function() {
-	}	
+	//------------------------------------------------------------------------------------------
 
-	this.ajaxXcap = function(opt) {
+	this.getPidf = function() {
+
+		if(this.pidfIndex < this.contacts.length) {
+
+			this.ajaxXcap({
+				url: '/pidf-manipulation/users/' + this.contacts[this.pidfIndex].uri + '/index',
+				success: this.onGetPidf,
+				error: this.onGetPidfError,
+				userParam: this.contacts[this.pidfIndex]
+			});
+		}
+	}
+
+	this.onGetPidf = function(xml, param) {
+
+		param.status = null;
+
+		var notes = xml.getElementsByTagName('note');
+
+		for(var i=0; i<notes.length; i++) {
+			var note = notes[i].childNodes[0].nodeValue.toLowerCase();
+			switch(note) {
+			case 'online':
+			case 'away':
+			case 'busy':
+			case 'offline':
+				param.status = note;
+				break;
+			case 'dnd':
+				param.status = 'busy';
+				break;
+			default:
+				if(note.indexOf('busy') >= 0)
+					param.status = 'busy';
+				else
+					console.log('[ XCAP ] Unknow note value:', note);
+				break;
+			}
+		}
+
+		if(param.status == null) {
+
+			var basics = xml.getElementsByTagName('basic');
+
+			for(var i=0; i<basics.length; i++) {
+				if(basics[i].childNodes[0].nodeValue === 'open') {
+					param.status = 'online';
+					break;
+				}
+			}
+		}
+
+		if(param.status == null)
+			param.status = 'offline';
+
+		this.trigger({ type:'xcapupdatecontact', contact: param });
+
+		this.getNextPidf();
+	}
+
+	this.onGetPidfError = function(jqXHR) {
+
+		if(jqXHR.status == 404) {
+
+			this.getNextPidf();
+		}
+		else {
+
+			this.onGeneralError(jqXHR);
+		}
+	}
+
+	this.getNextPidf = function() {
+
+		this.pidfIndex++;
+		this.getPidf();
+	}
+
+	//------------------------------------------------------------------------------------------
+
+	this.ajaxXcap = function(settings) {
+
+		var self = this;
 
 		$.ajax({
 			type: 'GET',
-			url: this.baseUrl + opt.url,
+			url: this.baseUrl + settings.url,
 			dataType: 'xml',
 		//	username: this.username,
 		//	password: this.password,
 			crossDomain: true,
 			context: this,
-			success: opt.success,
-			error: this.onError
+			success: (typeof settings.userParam === 'undefined') ? settings.success 
+				: function(jqXHR) { settings.success.call(self, jqXHR, settings.userParam); },
+			error: (typeof settings.error !== 'undefined') ? settings.error : this.onGeneralError
 		});
 	}
+
+	//------------------------------------------------------------------------------------------
 
 	this.finished = function() {
 
@@ -136,12 +234,13 @@ var xcapClient = function (){
 		this.trigger({ type:'xcapdone', contacts:this.contacts });
 	}
 
-	this.onError = function(xhr) {
+	this.onGeneralError = function(xhr) {
 
 		this.isUpdating = false;
 		this.trigger({ type:'xcaperror' });
 	}
 
+	//------------------------------------------------------------------------------------------
 
 	this.handlers = [];
 	
@@ -153,4 +252,6 @@ var xcapClient = function (){
 		for (var i=0; i<this.handlers.length; i++)
 			this.handlers[i](event);
 	};
+
+	//------------------------------------------------------------------------------------------
 }

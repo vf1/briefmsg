@@ -63,7 +63,16 @@ var controller = function(isDemo) {
 	var isContactContainUri = function(uri){
 		return (typeof findContactByUri(uri) !== 'undefined');
 	}
-	
+
+/*
+                   oooo                                               .                           .            
+                   `888                                             .o8                         .o8            
+ .oooo.o  .ooooo.   888            .ooooo.   .ooooo.  ooo. .oo.   .o888oo  .oooo.    .ooooo.  .o888oo  .oooo.o 
+d88(  "8 d88' `88b  888           d88' `"Y8 d88' `88b `888P"Y88b    888   `P  )88b  d88' `"Y8   888   d88(  "8 
+`"Y88b.  888ooo888  888           888       888   888  888   888    888    .oP"888  888         888   `"Y88b.  
+o.  )88b 888    .o  888  .o.      888   .o8 888   888  888   888    888 . d8(  888  888   .o8   888 . o.  )88b 
+8""888P' `Y8bod8P' o888o Y8P      `Y8bod8P' `Y8bod8P' o888o o888o   "888" `Y888""8o `Y8bod8P'   "888" 8""888P' 
+*/	
 
 	var selcontacts = new function(){
 	
@@ -108,7 +117,7 @@ var controller = function(isDemo) {
 		}
 
 		this.onXcapDone = function(event){
-			console.log(event);
+
 			$.mobile.loading('hide');
 
 			allContacts = allContacts.concat(event.contacts).sort();
@@ -120,14 +129,25 @@ var controller = function(isDemo) {
 			$.mobile.loading('hide');
 		}
 
+		this.onXcapUpdateContact = function(event){
+
+			for(var i=0; i<allContacts.length; i++)
+				if(allContacts[i].uri == event.contact.uri){
+
+					allContacts[i].status = event.contact.status;
+
+					$('#selcontacts li[data-index="' + i + '"] span[class~="contact-status"]').each(function(index, span){
+						$(span).removeClass().addClass('contact-status contact-' + allContacts[i].status);
+					});
+
+					break;
+				}
+		}
+
 		this.onPageShow = function(){
 			$.mobile.loading('show', { text:'Loading contacts...', textVisible: true });
 
 			main.internalTrigger({ type:'get-xcap-contacts' });
-
-			// setTimeout(function() {
-			// 	$.mobile.loading('hide');				
-			// }, 12000);
 		}
 
 		this.clear = function(){
@@ -168,7 +188,18 @@ var controller = function(isDemo) {
 			return false;
 		}
 	};
-	
+
+/*
+                .o8   o8o      .                                                                                     
+               "888   `"'    .o8                                                                                     
+ .ooooo.   .oooo888  oooo  .o888oo      ooo. .oo.  .oo.    .ooooo.   .oooo.o  .oooo.o  .oooo.    .oooooooo  .ooooo.  
+d88' `88b d88' `888  `888    888        `888P"Y88bP"Y88b  d88' `88b d88(  "8 d88(  "8 `P  )88b  888' `88b  d88' `88b 
+888ooo888 888   888   888    888         888   888   888  888ooo888 `"Y88b.  `"Y88b.   .oP"888  888   888  888ooo888 
+888    .o 888   888   888    888 .       888   888   888  888    .o o.  )88b o.  )88b d8(  888  `88bod8P'  888    .o 
+`Y8bod8P' `Y8bod88P" o888o   "888"      o888o o888o o888o `Y8bod8P' 8""888P' 8""888P' `Y888""8o `8oooooo.  `Y8bod8P' 
+                                                                                                d"     YD            
+                                                                                                "Y88888P'            
+*/	
 
 	var editmsg = new function(){
 
@@ -260,7 +291,16 @@ var controller = function(isDemo) {
 				event.preventDefault();
 		});
 	}	
-	
+
+/*
+                .o8   o8o      .                                            .                           .            
+               "888   `"'    .o8                                          .o8                         .o8            
+ .ooooo.   .oooo888  oooo  .o888oo       .ooooo.   .ooooo.  ooo. .oo.   .o888oo  .oooo.    .ooooo.  .o888oo  .oooo.o 
+d88' `88b d88' `888  `888    888        d88' `"Y8 d88' `88b `888P"Y88b    888   `P  )88b  d88' `"Y8   888   d88(  "8 
+888ooo888 888   888   888    888        888       888   888  888   888    888    .oP"888  888         888   `"Y88b.  
+888    .o 888   888   888    888 .      888   .o8 888   888  888   888    888 . d8(  888  888   .o8   888 . o.  )88b 
+`Y8bod8P' `Y8bod88P" o888o   "888"      `Y8bod8P' `Y8bod8P' o888o o888o   "888" `Y888""8o `Y8bod8P'   "888" 8""888P' 
+*/	
 	
 	var editcontact = new function(){
 
@@ -344,7 +384,17 @@ var controller = function(isDemo) {
 		});
 	};
 	
-	
+/*
+oooo                        o8o              
+`888                        `"'              
+ 888   .ooooo.   .oooooooo oooo  ooo. .oo.   
+ 888  d88' `88b 888' `88b  `888  `888P"Y88b  
+ 888  888   888 888   888   888   888   888  
+ 888  888   888 `88bod8P'   888   888   888  
+o888o `Y8bod8P' `8oooooo.  o888o o888o o888o 
+                d"     YD                    
+                "Y88888P'                    
+*/
 
 	var loginas = new function(){
 	
@@ -433,7 +483,18 @@ var controller = function(isDemo) {
 		});
 	};
 
-
+/*
+                        o8o            oooo                                           oooo              
+                        `"'            `888                                           `888              
+ .ooooo oo oooo  oooo  oooo   .ooooo.   888  oooo       oooo d8b  .ooooo.  oo.ooooo.   888  oooo    ooo 
+d88' `888  `888  `888  `888  d88' `"Y8  888 .8P'        `888""8P d88' `88b  888' `88b  888   `88.  .8'  
+888   888   888   888   888  888        888888.          888     888ooo888  888   888  888    `88..8'   
+888   888   888   888   888  888   .o8  888 `88b.        888     888    .o  888   888  888     `888'    
+`V8bod888   `V88V"V8P' o888o `Y8bod8P' o888o o888o      d888b    `Y8bod8P'  888bod8P' o888o     .8'     
+      888.                                                                  888             .o..P'      
+      8P'                                                                  o888o            `Y8P'       
+      "                                                                                                 
+*/
 	
 	var quickreply = new function(){
 	
@@ -497,7 +558,18 @@ var controller = function(isDemo) {
 		});
 	}
 	
-	
+/*
+                                     .o8   o8o                         
+                                    "888   `"'                         
+ .oooo.o  .ooooo.  ooo. .oo.    .oooo888  oooo  ooo. .oo.    .oooooooo 
+d88(  "8 d88' `88b `888P"Y88b  d88' `888  `888  `888P"Y88b  888' `88b  
+`"Y88b.  888ooo888  888   888  888   888   888   888   888  888   888  
+o.  )88b 888    .o  888   888  888   888   888   888   888  `88bod8P'  
+8""888P' `Y8bod8P' o888o o888o `Y8bod88P" o888o o888o o888o `8oooooo.  
+                                                            d"     YD  
+                                                            "Y88888P'  
+*/
+
 	var sending = new function(){
 
 		var index = 0;
@@ -537,6 +609,17 @@ var controller = function(isDemo) {
 		}
 	}
 
+/*
+                         .    o8o                                 
+                       .o8    `"'                                 
+ .ooooo.  oo.ooooo.  .o888oo oooo   .ooooo.  ooo. .oo.    .oooo.o 
+d88' `88b  888' `88b   888   `888  d88' `88b `888P"Y88b  d88(  "8 
+888   888  888   888   888    888  888   888  888   888  `"Y88b.  
+888   888  888   888   888 .  888  888   888  888   888  o.  )88b 
+`Y8bod8P'  888bod8P'   "888" o888o `Y8bod8P' o888o o888o 8""888P' 
+           888                                                    
+          o888o                                                   
+*/
 
 	var optionsui = new function(){
 	
@@ -566,6 +649,15 @@ var controller = function(isDemo) {
 		form.on('submit', function() { return false; });
 	}
 
+/*
+                                   .   
+                                 .o8   
+ .oooo.o  .ooooo.  ooo. .oo.   .o888oo 
+d88(  "8 d88' `88b `888P"Y88b    888   
+`"Y88b.  888ooo888  888   888    888   
+o.  )88b 888    .o  888   888    888 . 
+8""888P' `Y8bod8P' o888o o888o   "888" 
+*/
 
 	var sent = new function(){
 	
@@ -622,6 +714,15 @@ var controller = function(isDemo) {
 		}
 	}
 
+/*
+ooo. .oo.  .oo.    .ooooo.   .oooo.o  .oooo.o  .oooo.    .oooooooo  .ooooo.  
+`888P"Y88bP"Y88b  d88' `88b d88(  "8 d88(  "8 `P  )88b  888' `88b  d88' `88b 
+ 888   888   888  888ooo888 `"Y88b.  `"Y88b.   .oP"888  888   888  888ooo888 
+ 888   888   888  888    .o o.  )88b o.  )88b d8(  888  `88bod8P'  888    .o 
+o888o o888o o888o `Y8bod8P' 8""888P' 8""888P' `Y888""8o `8oooooo.  `Y8bod8P' 
+                                                        d"     YD            
+                                                        "Y88888P'            
+*/
 
 	var messagesui = new function(){
 	
@@ -844,7 +945,15 @@ var controller = function(isDemo) {
 		});
 	};
 
-
+/*
+                                                 .o8  
+                                                "888  
+ .oooo.o  .ooooo.  oooo  oooo  ooo. .oo.    .oooo888  
+d88(  "8 d88' `88b `888  `888  `888P"Y88b  d88' `888  
+`"Y88b.  888   888  888   888   888   888  888   888  
+o.  )88b 888   888  888   888   888   888  888   888  
+8""888P' `Y8bod8P'  `V88V"V8P' o888o o888o `Y8bod88P" 
+*/
 
 	var sound = new function(){
 
@@ -944,20 +1053,25 @@ var controller = function(isDemo) {
 				play(outgoing, 'sounds/outgoing');
 		}		
 	}
-	
 
+/*
+oo.ooooo.   .ooooo.  oo.ooooo.  oooo  oooo  oo.ooooo.   .oooo.o 
+ 888' `88b d88' `88b  888' `88b `888  `888   888' `88b d88(  "8 
+ 888   888 888   888  888   888  888   888   888   888 `"Y88b.  
+ 888   888 888   888  888   888  888   888   888   888 o.  )88b 
+ 888bod8P' `Y8bod8P'  888bod8P'  `V88V"V8P'  888bod8P' 8""888P' 
+ 888                  888                    888                
+o888o                o888o                  o888o               
+*/	
 	
 	var toasts = new function(){
 
-		var pageId;
+		var pageId = null;
+		var timerId = null;
 
 		var ctrl = new function(){
-			this.connecting = new function(){};
-			this.connected = new function(){};
-			this.disconnecting = new function(){};
-			this.disconnected = new function(){};
-			this.connectError = new function(){};
-			this.connectErrorReason = new function(){};
+			this.toast = new function(){};
+			this.message = new function(){};
 		}
 		
 		this.initialize = function(){
@@ -971,12 +1085,8 @@ var controller = function(isDemo) {
 
 				page.find('div[data-role="content"]').append(template());
 
-				ctrl.connecting[id] = page.find('div.toast-connecting');
-				ctrl.connected[id] = page.find('div.toast-connected');
-				ctrl.disconnecting[id] = page.find('div.toast-disconnecting');
-				ctrl.disconnected[id] = page.find('div.toast-disconnected');
-				ctrl.connectError[id] = page.find('div.toast-connect-error');
-				ctrl.connectErrorReason[id] = ctrl.connectError[id].children('span');
+				ctrl.toast[id] = $(page.find('div.popup-message'));
+				ctrl.message[id] = $(ctrl.toast[id].find('p'));
 			});
 		};
 		
@@ -984,65 +1094,57 @@ var controller = function(isDemo) {
 		
 		this.onPageBeforeShow = function(event){
 			pageId = event.target.id;
-			cancelAll();
 		};
 		
 		this.onConnecting = function(){
-			if(hasToasts()){
-				cancelAll();
-				ctrl.connecting[pageId].toast('show');
-			}
+			show('Connecting');
 		};
 		
 		this.onConnected = function(){
-			if(hasToasts()){
-				cancelAll();
-				ctrl.connected[pageId].toast('show');
-			}
+			show('Connected', 5000);
 		};
 		
 		this.onDisconnecting = function(){
-			if(hasToasts()){
-				cancelAll();
-				ctrl.disconnecting[pageId].toast('show');
-			}
+			show('Disconnecting');
 		};
 		
 		this.onDisconnected = function(){
-			if(hasToasts()){
-				cancelAll();
-				ctrl.disconnected[pageId].toast('show');
-			}
+			show('Disconnected');
 		};
 		
 		this.onConnectError = function(e){
-			if(hasToasts()){
-				cancelAll();
-				ctrl.connectErrorReason[pageId].text(e.reason);
-				ctrl.connectError[pageId].toast('show');
-			}
+			show('Failed to connect: ' + e.reason);
 		};
 
-		var hasToasts = function(){
-			if(typeof pageId === 'undefined')
-				return false;
-			if(ctrl.connecting[pageId] === undefined)
-				return false;
-			return true;
-		}
-		
-		var cancelAll = function(){
-			if(hasToasts()){
-				ctrl.connecting[pageId].toast('cancel');
-				ctrl.connected[pageId].toast('cancel');
-				ctrl.disconnecting[pageId].toast('cancel');
-				ctrl.disconnected[pageId].toast('cancel');
-				ctrl.connectError[pageId].toast('cancel');
+		var show = function(text, timeout){
+
+			if(pageId != null  && ctrl.toast[pageId] !== undefined) {
+
+				ctrl.message[pageId].text(text);
+				ctrl.toast[pageId].popup('open');
+
+				if(timerId != null)
+					clearTimeout(timerId);
+
+				if(typeof timeout !== 'undefined')
+					timerId = setTimeout(hide, timeout);
 			}
+		}
+
+		var hide = function() {
+			ctrl.toast[pageId].popup('close');
 		}
 	}
 	
-	
+/*
+    .                      oooo                 
+  .o8                      `888                 
+.o888oo  .oooo.    .oooo.o  888  oooo   .oooo.o 
+  888   `P  )88b  d88(  "8  888 .8P'   d88(  "8 
+  888    .oP"888  `"Y88b.   888888.    `"Y88b.  
+  888 . d8(  888  o.  )88b  888 `88b.  o.  )88b 
+  "888" `Y888""8o 8""888P' o888o o888o 8""888P' 
+*/	
 	
 	var tasks = new function(){
 	
@@ -1051,7 +1153,7 @@ var controller = function(isDemo) {
 		var pageInitEvents = ['onPageBeforeCreate', 'onPageCreate', 'onPageInit'];
 		var genericEvents = ['onSend', 'onBeforeSendOne', 'onSentOne', 'onSent',
 			'onConnecting', 'onConnected', 'onDisconnecting', 'onDisconnected', 'onConnectError',
-			'onIncomingMessage', 'onXcapDone', 'onXcapError'];
+			'onIncomingMessage', 'onXcapDone', 'onXcapError', 'onXcapUpdateContact'];
 			
 		var pageEventTypes = $.map(pageEvents, function(value, index){
 			return value.substring(2).toLowerCase();

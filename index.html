@@ -107,10 +107,20 @@
 			<div data-role="content">
 				<ul data-role="listview" data-filter="true">
 					<script id="selcontacts-li-checked" type="text/x-handlebars-template">
-						<li data-icon="check" data-theme="b" data-uri="{{contact.uri}}" data-index="{{index}}"><a href="#">{{contact.name}}</a></li>
+						<li data-icon="check" data-theme="b" data-uri="{{contact.uri}}" data-index="{{index}}">
+							<a href="#">
+								<span class="contact-status{{#if contact.status}} contact-{{contact.status}}{{/if}}"></span>
+								<span>{{contact.name}}</span>
+							</a>
+						</li>
 					</script>
 					<script id="selcontacts-li-unchecked" type="text/x-handlebars-template">
-						<li data-icon="plus" data-uri="{{contact.uri}}" data-index="{{index}}"><a href="#">{{contact.name}}</a></li>
+						<li data-icon="plus" data-uri="{{contact.uri}}" data-index="{{index}}">
+							<a href="#">
+								<span class="contact-status{{#if contact.status}} contact-{{contact.status}}{{/if}}"></span>
+								<span>{{contact.name}}</span>
+							</a>
+						</li>
 					</script>
 				</ul>
 			</div>
@@ -309,13 +319,7 @@
 		</div>
 
 		<script id="toasts" type="text/x-handlebars-template">
-			<div>
-				<div class="toast-connected" data-role="toast" data-duration="5000">Connected</div>
-				<div class="toast-connecting" data-role="toast" data-duration="600000">Connecting...</div>
-				<div class="toast-disconnecting" data-role="toast" data-duration="600000">Disconnecting...</div>
-				<div class="toast-disconnected" data-role="toast" data-duration="3000">Disconnected</div>
-				<div class="toast-connect-error" data-role="toast" data-duration="7000">Failed to connect: <span></span></div>
-			</div>
+			<div class="popup-message" data-role="popup" data-theme="a"><p></p></div>
 		</script>
 		
 		<script src="assets/md5.js"></script>
@@ -330,7 +334,6 @@
 		<script src="assets/jquery-1.7.2.min.js"></script>
 		<script src="assets/jquery.mobile-1.2.0.min.js"></script>
 		<script src="assets/jquery.validate.min.js"></script>
-		<script src="assets/jquery.mobile.toast.min.js"></script>
 		<script src="assets/jquery.officesipWebSocket.js"></script>
 		<script src="assets/jquery.helpers.js"></script>
 		<script src="assets/handlebars-1.0.0.beta.6.js"></script>
@@ -472,7 +475,7 @@
 				});
 
 				ui.on('get-xcap-contacts', function() {
-					xcap.getContacts();
+					xcap.startUpdate();
 				});
 
 				sip.onAny(ui.trigger);

@@ -201,7 +201,6 @@ DigestAuthentication.XMLHttpRequest = function() {
 
   var _buildChalange = function(WWWAuthenticate) {
     var credentials = DigestAuthentication.getCredentials(_host);
-    console.log(credentials);
     var Authorization = new DigestAuthentication.Header();
     Authorization.setCredantials(credentials.username, credentials.password);
     delete credentials.password;
@@ -236,7 +235,6 @@ DigestAuthentication.XMLHttpRequest = function() {
   _xhr.onreadystatechange = function() {
     if (_xhr.readyState === 4 && _xhr.status === 401) {
       var WWWAuthenticate = _xhr.getResponseHeader('WWW-Authenticate');
-      console.log('digest.authentication.js!!!!!!!!!!!!!!!!!!!!!!!!!!');
       if (WWWAuthenticate) {
         _sendRequestWithAuthorizationHeader(WWWAuthenticate);
         return; 
@@ -247,7 +245,6 @@ DigestAuthentication.XMLHttpRequest = function() {
   };
 
   this.open = function(method, url, async) {
-    console.log('digest.authentication.js!!!!!!!!!!!!!!!!!!!!!!!!!!');
     _options.method = method;
     _options.url = url;
     _options.async = async;
@@ -257,7 +254,6 @@ DigestAuthentication.XMLHttpRequest = function() {
   };
 
   this.send = function(data) {
-    console.log('digest.authentication.js!!!!!!!!!!!!!!!!!!!!!!!!!!');
     _data = data;
     var Authorization = _digestAuthorizations[_host];
     if (Authorization) {
@@ -265,7 +261,6 @@ DigestAuthentication.XMLHttpRequest = function() {
     } else {
       data = null;
     }
-     //_xhr.setRequestHeader('X-DigestAuthentication', 'header');
     _xhr.send(data);
   };
 
