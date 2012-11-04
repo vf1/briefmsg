@@ -52,6 +52,7 @@ var controller = function(isDemo) {
 	var options;
 	var initialHistoryLength;
 	var isPhonegap = (typeof cordova !== 'undefined');
+	var status = 'online';
 	
 	var findContactByUri = function(uri){
 		for(var i=0; i<contacts.length; i++)
@@ -113,7 +114,7 @@ o.  )88b 888    .o  888  .o.      888   .o8 888   888  888   888    888 . d8(  8
 				else
 					template1.append({contact:allContacts[i], index:i});
 			}
-			template1.container.listview('refresh');			
+			template1.container.listview('refresh');
 		}
 
 		this.onXcapDone = function(event){
@@ -944,6 +945,90 @@ o888o o888o o888o `Y8bod8P' 8""888P' 8""888P' `Y888""8o `8oooooo.  `Y8bod8P'
 			return true;
 		});
 	};
+
+/*
+             .                 .                        
+           .o8               .o8                        
+ .oooo.o .o888oo  .oooo.   .o888oo oooo  oooo   .oooo.o 
+d88(  "8   888   `P  )88b    888   `888  `888  d88(  "8 
+`"Y88b.    888    .oP"888    888    888   888  `"Y88b.  
+o.  )88b   888 . d8(  888    888 .  888   888  o.  )88b 
+8""888P'   "888" `Y888""8o   "888"  `V88V"V8P' 8""888P' 
+*/
+
+	var statusui = new function(){
+
+		var closeTimerId = null;
+
+		var ctrl = new function(){
+
+			this.popup = $('#status');
+			this.statusOnline = $('#status-online');
+			this.statusAway = $('#status-away');
+			this.statusBusy = $('#status-busy');
+		}
+
+		this.updatePopup = function(){
+
+			this.updateIcon(ctrl.statusOnline, 'online');
+			this.updateIcon(ctrl.statusAway, 'away');
+			this.updateIcon(ctrl.statusBusy, 'busy');
+		}
+
+		this.updateIcon = function(li, controlStatus){
+
+			var check = (status === controlStatus);
+
+			li.find('div>span')
+				.removeClass(check ? 'ui-icon-none' : 'ui-icon-check')
+				.addClass(check ? 'ui-icon-check' : 'ui-icon-none');
+		}
+
+		this.changeStatus = function(newStatus){
+
+			status = newStatus;
+			
+			this.updatePopup();
+
+			if(closeTimerId != null)
+				clearTimeout(closeTimerId);
+			closeTimerId = setTimeout(
+				function() { statusui.closePopup(); }, 800);
+		}
+
+		this.beforeShowPopup = function(){
+
+			this.updatePopup();
+
+			if(closeTimerId != null)
+				clearTimeout(closeTimerId);
+		}
+
+		this.closePopup = function(){
+
+			ctrl.popup.popup('close');
+		}
+
+		ctrl.popup.on('popupbeforeposition', function(){
+			statusui.beforeShowPopup();
+		});
+
+		ctrl.statusOnline.find('a').on('vclick', function(){
+			statusui.changeStatus('online');
+			return false;
+		});
+
+		ctrl.statusAway.find('a').on('vclick', function(){
+			statusui.changeStatus('away');
+			return false;
+		});
+
+		ctrl.statusBusy.find('a').on('vclick', function(){
+			statusui.changeStatus('busy');
+			return false;
+		});
+	}
+
 
 /*
                                                  .o8  

@@ -41,12 +41,22 @@
 				</div>
 				<div id="message-nomessages" style="text-align:center;"><h1>No Messages</h1></div>
 				<div id="menu" data-role="popup" data-position-to="window">
-						<ul data-role="listview" data-inset="true" data-theme="a" id="menu-listview">
-							<li><a href="#loginas">Account</a></li>
-							<li><a href="#contacts">Contacts</a></li>
-							<li><a href="#options">Options</a></li>
-							<li><a href="#about">About</a></li>
-						</ul>
+					<ul data-role="listview" data-inset="true" data-theme="a" id="menu-listview">
+						<li><a href="#loginas">Account</a></li>
+						<li><a href="#contacts">Contacts</a></li>
+						<li><a href="#options">Options</a></li>
+						<li><a href="#about">About</a></li>
+					</ul>
+				</div>
+				<div id="status" data-role="popup" data-position-to="window">
+					<ul data-role="listview" data-inset="true" data-theme="c" id="menu-listview">
+						<li data-icon="check" id="status-online"><a href="#">
+							<span class="contact-status contact-online"></span>Online</a></li>
+						<li data-icon="check" id="status-away"><a href="#">
+							<span class="contact-status contact-away"></span>Away</a></li>
+						<li data-icon="check" id="status-busy"><a href="#">
+							<span class="contact-status contact-busy"></span>Busy</a></li>
+					</ul>
 				</div>
 			</div>
 			<div data-role="footer" data-position="fixed">
@@ -54,6 +64,7 @@
 					<ul>
 						<li><a href="#selcontacts" data-icon="star">New Message</a></li>
 						<li><a href="#menu" data-rel="popup">Menu</a></li>
+						<li><a href="#status" data-rel="popup">Status</a></li>
 					</ul>
 				</div>
 			</div>
