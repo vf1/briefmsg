@@ -994,6 +994,8 @@ o.  )88b   888 . d8(  888    888 .  888   888  o.  )88b
 				clearTimeout(closeTimerId);
 			closeTimerId = setTimeout(
 				function() { statusui.closePopup(); }, 800);
+
+			main.internalTrigger( { type:'statuschanged', status:status } );
 		}
 
 		this.beforeShowPopup = function(){
@@ -1186,7 +1188,7 @@ o888o                o888o                  o888o
 		};
 		
 		this.onConnected = function(){
-			show('Connected', 5000);
+			show('Connected', 2000);
 		};
 		
 		this.onDisconnecting = function(){
@@ -1198,7 +1200,7 @@ o888o                o888o                  o888o
 		};
 		
 		this.onConnectError = function(e){
-			show('Failed to connect: ' + e.reason);
+			show('Connection Error: ' + e.reason);
 		};
 
 		var show = function(text, timeout){

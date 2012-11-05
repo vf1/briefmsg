@@ -41,14 +41,13 @@ DigestAuthentication = {
   },
 
   getCredentials: function(host) {
-    console.log(_digestCredentials['*']);
-    return _digestCredentials['*'];
-
-
-    host = host || '*';
     if (_digestCredentials[host]) {
       return _digestCredentials[host];
-    } else {
+    }
+    else if(_digestCredentials['*']) {
+      return _digestCredentials['*'];
+    }
+    else {
       return false;
     }
   },
@@ -226,7 +225,6 @@ DigestAuthentication.XMLHttpRequest = function() {
     for (name in _headers) {
       _xhr.setRequestHeader(name, _headers[name]);
     }
-    //_xhr.setRequestHeader('X-DigestAuthentication', 'header');
     _xhr.send(_data);
   };
 

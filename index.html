@@ -4,7 +4,6 @@
 		<meta name="viewport" content="user-scalable=no, width=device-width" />
 		<meta name="viewport" content="initial-scale=1.0; maximum-scale=1.0;">
 		<link rel="stylesheet" href="assets/jquery.mobile-1.2.0.min.css" />
-		<link rel="stylesheet" href="assets/jquery.mobile.toast.min.css" /> 
 		<link rel="stylesheet" href="screen.css" />
 		<title>Brief Msg</title>
     </head>
@@ -476,10 +475,13 @@
 					saveJsonedObject('com.briefmsg.login', e.login);
 					sip.register(e.login.name, e.login.domain, e.login.password, e.login.proxy);
 					var server = (typeof e.login.proxy !== 'undefined') ? e.login.proxy : e.login.domain;
-					xcap.initialize(server, 'sip:briefmsg@officesip.local', e.login.name, e.login.password);
+					xcap.initialize(server, 'sip:'+e.login.name+'@'+e.login.domain, e.login.name, e.login.password);
 				});
 
-				ui.on('logout', sip.unRegister);
+				ui.on('logout', function() {
+					xcap.dispose();
+					sip.unRegister();
+				});
 
 				ui.on('send', function(e) {
 					sip.send(e.to, e.text);
@@ -487,6 +489,10 @@
 
 				ui.on('get-xcap-contacts', function() {
 					xcap.startUpdate();
+				});
+
+				ui.on('statuschanged', function(e) {
+					xcap.setStatus(e.status);
 				});
 
 				sip.onAny(ui.trigger);

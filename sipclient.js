@@ -113,10 +113,16 @@ var sipClient = function (){
                 }
 
             case tsip_event_code_e.STACK_STARTING:
-            case tsip_event_code_e.STACK_FAILED_TO_START:
             case tsip_event_code_e.STACK_FAILED_TO_STOP:
+            	{
+            		break;
+            	}
+            	
+            case tsip_event_code_e.STACK_FAILED_TO_START:
             default:
                 {
+					connected = false;
+					client.trigger({type: 'connecterror', reason: evt.s_phrase});
                     break;
                 }
         }
@@ -193,13 +199,20 @@ var sipClient = function (){
 			case tsip_event_message_type_e.I_MESSAGE:
 				{
 					evt.get_session().accept();
-					var uri = evt.get_session().o_uri_from;
-					client.trigger({
-						type: 'incomingmessage',
-						sender: uri.s_scheme + ':' + uri.s_user_name + '@' + uri.s_host,
-						time: new Date(),
-						text: evt.get_message().get_content_as_string()
-					});
+
+					var contentType = evt.get_message().get_content_type();
+
+					if(contentType === 'text/plain') {
+
+						var uri = evt.get_session().o_uri_from;
+
+						client.trigger({
+							type: 'incomingmessage',
+							sender: uri.s_scheme + ':' + uri.s_user_name + '@' + uri.s_host,
+							time: new Date(),
+							text: evt.get_message().get_content_as_string()
+						});
+					}
 					break;
 				}
 			case tsip_event_message_type_e.AO_MESSAGE:
