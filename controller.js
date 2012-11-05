@@ -46,11 +46,11 @@ var controller = function(isDemo) {
 
 	var main = this;
 	var contacts = [];
+	var xcapContacts = [];
 	var quickReplies = [];
 	var messages = [];
 	var connected = false;
 	var options;
-	var initialHistoryLength;
 	var isPhonegap = (typeof cordova !== 'undefined');
 	var status = 'online';
 	
@@ -58,6 +58,9 @@ var controller = function(isDemo) {
 		for(var i=0; i<contacts.length; i++)
 			if(contacts[i].uri == uri)
 				return contacts[i];
+		for(var i=0; i<xcapContacts.length; i++)
+			if(xcapContacts[i].uri == uri)
+				return xcapContacts[i];
 		return;
 	}
 	
@@ -119,9 +122,17 @@ o.  )88b 888    .o  888  .o.      888   .o8 888   888  888   888    888 . d8(  8
 
 		this.onXcapDone = function(event){
 
+			xcapContacts = event.contacts;
+
 			$.mobile.loading('hide');
 
-			allContacts = allContacts.concat(event.contacts).sort();
+			for(var i=0; i<xcapContacts.length; i++){
+				var index = indexOfByUri(allContacts, xcapContacts[i].uri);
+				if(index < 0)
+					allContacts.push(xcapContacts[i]);
+				else if(allContacts[index].generated)
+					allContacts[index] = xcapContacts[i];
+			}
 
 			this.refreshListview();
 		}
@@ -176,17 +187,17 @@ o.  )88b 888    .o  888  .o.      888   .o8 888   888  888   888    888 . d8(  8
 		
 		var addFromMessages = function(array){
 			for(var i=0; i<messages.length; i++){
-				if(isContain(array, messages[i].sender) == false)
-					array.push({ name: messages[i].sender.substring(4), uri: messages[i].sender });
+				if(indexOfByUri(array, messages[i].sender) < 0)
+					array.push({ name: messages[i].sender.substring(4), uri: messages[i].sender, generated: true });
 			}
 			return array;
 		}
 		
-		var isContain = function(array, uri){
+		var indexOfByUri = function(array, uri){
 			for(var i=0; i<array.length; i++)
 				if(array[i].uri == uri)
-					return true;
-			return false;
+					return i;
+			return -1;
 		}
 	};
 
@@ -691,15 +702,7 @@ o.  )88b 888    .o  888   888    888 .
 		}
 
 		this.onOkBtn = function(e){
-			if(typeof initialHistoryLength !== 'undefined' && typeof history.length !== 'undefined' && history.length != initialHistoryLength && isDemo == false){
-				var offset = initialHistoryLength - history.length;
-				console.log('history.go ' + offset);
-				history.go(offset);
-			}
-			else{
-				console.log('Do not know initialHistoryLength, go to #message');
-				$.mobile.changePage('#message');
-			}
+			$.mobile.changePage('#message');
 		}
 		
 		ctrl.ok.on('click', function(){
@@ -859,10 +862,6 @@ o888o o888o o888o `Y8bod8P' 8""888P' 8""888P' `Y888""8o `8oooooo.  `Y8bod8P'
 		
 		this.onPageShow = function(){
 			this.update();
-			if(typeof initialHistoryLength === 'undefined'){
-				initialHistoryLength = history.length;
-				console.log('set initialHistoryLength: ' + initialHistoryLength );
-			}
 		}
 
 		this.onNext = function(){

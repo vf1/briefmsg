@@ -342,6 +342,15 @@
 
 		<script src="cordova-1.7.0.js"></script>
 		<script src="assets/jquery-1.7.2.min.js"></script>
+
+		<script type="text/javascript">
+		(function (){
+			$(document).on('mobileinit', function() {
+	            $.mobile.changePage.defaults.changeHash = false;
+	        });		
+		})();
+		</script>
+
 		<script src="assets/jquery.mobile-1.2.0.min.js"></script>
 		<script src="assets/jquery.validate.min.js"></script>
 		<script src="assets/jquery.officesipWebSocket.js"></script>
@@ -356,10 +365,10 @@
 		<script src="sipclient.js"></script>
 		<script src="sipdemoclient.js"></script>
 		<script src="debug.js"></script>
-		
+
 		<script type="text/javascript">
 		(function (){
-		
+
 			var params = $.getUrlVars();
 			var isDemo = parseInt(params['demo']) > 0;
 			
