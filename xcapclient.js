@@ -50,10 +50,13 @@ var xcapClient = function (){
 
 	this.setStatus = function(status) {
 
-		if(this._status != status) {
+		if(this._isReady) {
 
-			this._status = status;
-			this._setStatus();
+			if(this._status != status) {
+
+				this._status = status;
+				this._setStatus();
+			}
 		}
 	}
 
