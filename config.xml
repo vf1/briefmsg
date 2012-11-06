@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<widget xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0" id="com.phonegap.briefmsg" version="0.9.3">
+<widget xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0" id="com.phonegap.briefmsg" version="1.0.1">
 
     <name>Brief Msg</name>
-    <description>An simple SIP messenger.</description>
+    <description>Simple SIP messenger.</description>
     <author href="https://briefmsg.org" email="support@briefmsg.org">Vitali Fomine</author>
 
 	<icon src="images/icon.png" />
