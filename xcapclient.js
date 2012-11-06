@@ -31,8 +31,6 @@ var xcapClient = function (){
 		this._status = 'online';
 		this._tupleId = 'briefmsg' + Math.floor(Math.random() * 900 + 100);
 
-		DigestAuthentication.registerCredentials(username, password);
-
 		this._getXcapCaps();
 	}
 
@@ -294,8 +292,8 @@ var xcapClient = function (){
 			type: settings.type || 'GET',
 			url: this._baseUrl + settings.url,
 			dataType: 'xml',
-		//	username: this._username,
-		//	password: this._password,
+			username: this._username,
+			password: this._password,
 			contentType: settings.contentType,
 			data: settings.data,
 			crossDomain: true,

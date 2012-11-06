@@ -10,53 +10,6 @@ DigestAuthentication = {
   registerInterface: function() {
     XMLHttpRequest = DigestAuthentication.XMLHttpRequest;
   },
-
-  registerCredentials: function(username, password, host) {
-    host = host || '*';
-    var credentials = _digestCredentials[host] || {};
-    credentials.username = username;
-    credentials.password = password;
-    _digestCredentials[host] = credentials;
-  },
-
-  registerUsername: function(username, host) {
-    host = host || '*';
-    var credentials = _digestCredentials[host] || {};
-    credentials.username = username;
-    _digestCredentials[host] = credentials;
-  },
-
-  registerPassword: function(password, host) {
-    host = host || '*';
-    var credentials = _digestCredentials[host] || {};
-    credentials.password = password;
-    _digestCredentials[host] = credentials;
-  },
-
-  registerHA1: function(ha1, host) {
-    host = host || '*';
-    var credentials = _digestCredentials[host] || {};
-    credentials.ha1 = ha1;
-    _digestCredentials[host] = credentials;
-  },
-
-  getCredentials: function(host) {
-    if (_digestCredentials[host]) {
-      return _digestCredentials[host];
-    }
-    else if(_digestCredentials['*']) {
-      return _digestCredentials['*'];
-    }
-    else {
-      return false;
-    }
-  },
-
-  reset: function(host) {
-    host = host || '*';
-    delete _digestCredentials[host];
-    _digestChalanges = {};
-  }
 };
 
 DigestAuthentication.Header = function() {
@@ -167,6 +120,8 @@ DigestAuthentication.XMLHttpRequest = function() {
   var self = this;
   var _options = {}, _headers = {};
   var _readyState = 0, _path, _host;
+  var _data;
+  var _username, _password;
 
   var _attrReaders = ['status', 'statusText', 'responseText', 'responseXML', 'upload'];
   var _attrAccessors = ['timeout', 'asBlob', 'followRedirects', 'withCredentials'];
@@ -199,16 +154,13 @@ DigestAuthentication.XMLHttpRequest = function() {
   });
 
   var _buildChalange = function(WWWAuthenticate) {
-    var credentials = DigestAuthentication.getCredentials(_host);
+
     var Authorization = new DigestAuthentication.Header();
-    Authorization.setCredantials(credentials.username, credentials.password);
-    delete credentials.password;
-    if (credentials.ha1) {
-      Authorization.setHA1(credentials.ha1);
-    }
+    Authorization.setCredantials(_username, _password);
     Authorization.parse(WWWAuthenticate);
-    _digestAuthorizations[_host] = Authorization;
-    DigestAuthentication.registerHA1(Authorization.getHA1(), _host);
+
+    _digestAuthorizations[_username+':'+_password+'@'+_host] = Authorization;
+
     return Authorization.generate(_path, _options.method);
   };
 
@@ -242,10 +194,12 @@ DigestAuthentication.XMLHttpRequest = function() {
     self.onreadystatechange.call(self);
   };
 
-  this.open = function(method, url, async) {
+  this.open = function(method, url, async, username, password) {
     _options.method = method;
     _options.url = url;
     _options.async = async;
+    _username = username;
+    _password = password;
     _host = url.replace(/http:\/\//, '').split('/').shift();
     _path = url.replace(/http:\/\/[^\/]*/, '');
     _xhr.open(method, url, async);
@@ -253,11 +207,11 @@ DigestAuthentication.XMLHttpRequest = function() {
 
   this.send = function(data) {
     _data = data;
-    var Authorization = _digestAuthorizations[_host];
-    if (Authorization) {
-      _xhr.setRequestHeader('Authorization', Authorization.generate(_path, _options.method));
-    } else {
-      data = null;
+    if(_username && _password) {
+      var Authorization = _digestAuthorizations[_username+':'+_password+'@'+_host];
+      if(Authorization) {
+        _xhr.setRequestHeader('Authorization', Authorization.generate(_path, _options.method));
+      }
     }
     _xhr.send(data);
   };
