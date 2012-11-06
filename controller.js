@@ -89,9 +89,17 @@ o.  )88b 888    .o  888  .o.      888   .o8 888   888  888   888    888 . d8(  8
 			return $.grep(allContacts, function(value, index) { return selected[index]; } );
 		}
 		
-		this.setSelected = function(select){
+		this.getSelectedUri = function(){
+			return $.map(this.getSelected(), function(contact) { return contact.uri; });
+		}
+		
+		this.setSelectedUri = function(select){
 		
 			createContacts();
+			this._setSelectedUri(select);
+		}
+
+		this._setSelectedUri = function(select){
 
 			selected = $.map(allContacts, function(value, index){
 				for(var i=0;i<select.length; i++){
@@ -109,6 +117,14 @@ o.  )88b 888    .o  888  .o.      888   .o8 888   888  888   888    888 . d8(  8
 		};
 
 		this.refreshListview = function(){
+
+			{
+				var selected = this.getSelectedUri();
+
+				allContacts.sort(function(a, b) { return ( a.name == b.name ) ? 0 : ( ( a.name > b.name ) ? 1 : -1 ); });
+				
+				this._setSelectedUri(selected);
+			}
 
 			template1.empty();
 			for(var i=0; i<allContacts.length; i++){
@@ -182,7 +198,7 @@ o.  )88b 888    .o  888  .o.      888   .o8 888   888  888   888    888 . d8(  8
 		});
 		
 		var createContacts = function(){
-			allContacts = addFromMessages(contacts.slice(0)).sort();
+			allContacts = addFromMessages(contacts.slice(0));
 		}
 		
 		var addFromMessages = function(array){
@@ -890,7 +906,7 @@ o888o o888o o888o `Y8bod8P' 8""888P' 8""888P' `Y888""8o `8oooooo.  `Y8bod8P'
 		};
 		
 		this.onReply = function(){
-			selcontacts.setSelected([messages[this.index].sender]);
+			selcontacts.setSelectedUri([messages[this.index].sender]);
 			//editmsg.setText(messages[this.index].text.replace(new RegExp('^', 'mg'), '>') + '\n');
 			var text = messages[this.index].text;
 			var index = text.lastIndexOf('\n');
@@ -902,7 +918,7 @@ o888o o888o o888o `Y8bod8P' 8""888P' 8""888P' `Y888""8o `8oooooo.  `Y8bod8P'
 		}
 
 		this.onQuickReply = function(){
-			selcontacts.setSelected([messages[this.index].sender]);
+			selcontacts.setSelectedUri([messages[this.index].sender]);
 		}
 
 		this.onIncomingMessage = function(e){

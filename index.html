@@ -111,7 +111,7 @@
 
 		<div id="selcontacts" data-role="page">
 			<div data-role="header" data-position="fixed">
-				<a href="#message" data-rel="back" data-icon="back">Back</a>
+				<a href="#message" data-icon="back">Back</a>
 				<h1>Select Contacts</h1>
 			</div>
 			<div data-role="content">
@@ -146,7 +146,7 @@
 				
 		<div id="editmessage" data-role="page">
 			<div data-role="header">
-				<a href="#message" data-rel="back" data-icon="back">Back</a>
+				<a href="#message" data-icon="back">Back</a>
 				<h1>Text of Message</h1>
 			</div>
 			<div data-role="content">
@@ -201,7 +201,7 @@
 
 		<div id="contacts" data-role="page">
 			<div data-role="header" data-position="fixed">
-				<a href="#message" data-rel="back" data-icon="back">Back</a>
+				<a href="#message" data-icon="back">Back</a>
 				<h1>Edit Contacts</h1>
 			</div>
 			<div data-role="content">
@@ -237,8 +237,8 @@
 					</script>
 				</div>
 				<div class="ui-grid-a">
-					<div class="ui-block-a"><a href="#" data-rel="back" data-role="button">No</a></div>
-					<div class="ui-block-b"><a href="#" id="deletecontact-yes" data-rel="back" data-role="button">Yes</a></div>
+					<div class="ui-block-a"><a href="#contacts" data-role="button">No</a></div>
+					<div class="ui-block-b"><a href="#contacts" id="deletecontact-yes" data-role="button">Yes</a></div>
 				</div>
 			</div>
 		</div>
@@ -258,8 +258,8 @@
 						<input type="text" id="addcontact-uri" name="uri" class="required email" placeholder="Address, e.g. joe@officesip.local"></input>
 					</div>
 					<div class="ui-grid-a">
-						<div class="ui-block-a"><a href="#" data-rel="back" data-role="button">Cancel</a></div>
-						<div class="ui-block-b"><a href="#" id="addcontact-ok" data-rel="back" data-role="button">Ok</a></div>
+						<div class="ui-block-a"><a href="#contacts" data-role="button">Cancel</a></div>
+						<div class="ui-block-b"><a href="#contacts" id="addcontact-ok" data-role="button">Ok</a></div>
 					</div>
 				</form>
 			</div>
@@ -268,7 +268,7 @@
 		
 		<div id="loginas" data-role="page">
 			<div data-role="header" data-position="fixed">
-				<a href="#message" data-rel="back" data-icon="back">Back</a>
+				<a href="#message" data-icon="back">Back</a>
 				<h1>Login As</h1>
 			</div>
 			<div data-role="content">
@@ -303,7 +303,7 @@
 		
 		<div id="options" data-role="page">
 			<div data-role="header">
-				<a href="#message" data-rel="back" data-icon="back">Back</a>
+				<a href="#message" data-icon="back">Back</a>
 				<h1>Options</h1>
 			</div>
 			<div data-role="content">
@@ -319,11 +319,11 @@
 
 		<div id="about" data-role="page">
 			<div data-role="header">
-				<a href="#message" data-rel="back" data-icon="back">Back</a>
+				<a href="#message" data-icon="back">Back</a>
 				<h1>About</h1>
 			</div>
 			<div data-role="content">
-				<h2>Breif Msg 0.9</h2>
+				<h2>Breif Msg 1.0</h2>
 				<p>Homepage: <a href="http://www.briefmsg.org" target="_blank" rel="external">briefmsg.org</a></p>
 			</div>
 		</div>
@@ -372,10 +372,6 @@
 			var params = $.getUrlVars();
 			var isDemo = parseInt(params['demo']) > 0;
 			
-			if(isDemo && BrowserDetect.browser != 'Chrome'){
-				$('a.[data-rel="back"]').removeAttr('data-rel');
-			}
-		
 			var ui = new controller(isDemo);
 			
 			if(isDemo){
