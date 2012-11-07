@@ -7,32 +7,12 @@ var sipClient = function (){
 	var disconnectByUser;
 	var connected = false;
 
-    this.register = function(username, realm, password, proxy){
-
-		var proxyAddr;
-		var proxyPort;
-
-		if(typeof proxy === 'undefined' || proxy.length == 0) {
-			proxyAddr = realm;
-			proxyPort = 5060;
-		}
-		else {
-			var colon = proxy.indexOf(':', 5);
-			
-			if(colon < 0) {
-				proxyAddr = proxy;
-				proxyPort = 5060;
-			}
-			else {
-				proxyAddr = proxy.substring(0, colon);
-				proxyPort = parseInt(proxy.substring(colon + 1));
-			}
-		}
+    this.register = function(username, realm, password, server){
 
 		disconnectByUser = false;
 		
 		try{
-			oSipStack = new tsip_stack(realm, username, 'sip:' + username + '@' + realm, proxyAddr, proxyPort,
+			oSipStack = new tsip_stack(realm, username, 'sip:' + username + '@' + realm, server.url, server.port,
 								tsip_stack.prototype.SetPassword(password),
 								tsip_stack.prototype.SetHeader('User-Agent', 'briefmsg'));
 

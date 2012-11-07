@@ -332,6 +332,15 @@
 			<div class="popup-message" data-role="popup" data-theme="a"><p></p></div>
 		</script>
 
+		<script src="assets/md5.js"></script>
+		<script src="assets/digest.authentication.js"></script>
+
+		<script type="text/javascript">
+		(function (){
+			DigestAuthentication.registerInterface();
+		})();
+		</script>
+
 		<script src="cordova-1.7.0.js"></script>
 		<script src="assets/jquery-1.7.2.min.js"></script>
 
@@ -470,9 +479,11 @@
 
 				ui.on('login', function(e) {
 					saveJsonedObject('com.briefmsg.login', e.login);
-					sip.register(e.login.name, e.login.domain, e.login.password, e.login.proxy);
-					var server = (typeof e.login.proxy !== 'undefined') ? e.login.proxy : e.login.domain;
-					xcap.initialize(server, 'sip:'+e.login.name+'@'+e.login.domain, e.login.name, e.login.password);
+
+					var server = getServerAddress(e.login.domain, e.login.proxy);
+
+					sip.register(e.login.name, e.login.domain, e.login.password, server);
+					xcap.initialize(server.url+':'+server.port, 'sip:'+e.login.name+'@'+e.login.domain, e.login.name, e.login.password);
 				});
 
 				ui.on('logout', function() {
@@ -495,6 +506,31 @@
 				sip.onAny(ui.trigger);
 				xcap.onAny(ui.trigger);
 			};
+
+			var getServerAddress = function(realm, proxy) {
+
+				var url, port;
+
+				if(typeof proxy === 'undefined' || proxy.length == 0) {
+					url = realm;
+					port = 5060;
+				}
+				else {
+					var colon = proxy.indexOf(':', 5);
+					
+					if(colon < 0) {
+						url = proxy;
+						port = 5060;
+					}
+					else {
+						url = proxy.substring(0, colon);
+						port = parseInt(proxy.substring(colon + 1));
+					}
+				}
+
+				return { url: url, port: port };
+			}
+
 		})();
 		
 		window.emulateIncomingMessage = function(sender, text) {

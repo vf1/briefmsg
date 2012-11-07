@@ -202,7 +202,7 @@ DigestAuthentication.XMLHttpRequest = function() {
     _password = password;
     _host = url.replace(/http:\/\//, '').split('/').shift();
     _path = url.replace(/http:\/\/[^\/]*/, '');
-    _xhr.open(method, url, async);
+    _xhr.open(method, url, async, username, password);
   };
 
   this.send = function(data) {
