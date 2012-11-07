@@ -5,7 +5,17 @@
     <description>Simple SIP messenger.</description>
     <author href="https://briefmsg.org" email="support@briefmsg.org">Vitali Fomine</author>
 
-	<icon src="images/icon.png" />
+	<icon src="images/icon36.png" width="36" height="36" />
+	<icon src="images/icon48.png" width="48" height="48" />
+	<icon src="images/icon72.png" width="72" height="72" />
+	<icon src="images/icon96.png" width="96" height="96" />
+	<icon src="images/icon144.png" width="144" height="144" />
+
+	<icon src="images/icon36.png" gap:platform="android" gap:density="ldpi" />
+	<icon src="images/icon48.png" gap:platform="android" gap:density="mdpi" />
+	<icon src="images/icon72.png" gap:platform="android" gap:density="hdpi" />
+	<icon src="images/icon96.png" gap:platform="android" gap:density="xhdpi" />
+
 	<gap:splash src="images/splash.png" />
 
 </widget>
