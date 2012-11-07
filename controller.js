@@ -526,63 +526,96 @@ d88' `888  `888  `888  `888  d88' `"Y8  888 .8P'        `888""8P d88' `88b  888'
 	
 	var quickreply = new function(){
 	
+		var deleteIndex;
+
 		var template1 = createTemplate('#quickreplylist');
+		var templete2 = createTemplate('#deleteqreply-template');
+
+		var ctrl = new function(){
+			this.textEdit = $('#addqreply-text');
+			this.form = $('#addqreply-form');
+		}
+		
 		
 		this.update = function(){
 
 			quickReplies.sort();
 
 			template1.empty().append(quickReplies);
-			template1.container.trigger('create');
+			template1.container.listview('refresh');
 		};
+
+		this.onPageBeforeShow = this.update;
+		
+		//-----------------------------------------------
+		// SEND
 		
 		this.onClickReply = function(text){
-			console.log('onClickReply');
+
 			main.internalTrigger({type: 'send', to: selcontacts.getSelected(), text: text});
 		}
 		
-		this.onPageBeforeShow = this.update;
-		
-		template1.container.on('click', 'a', function(){
+		template1.container.on('click', 'a.[href="#sending"]', function(){
 			quickreply.onClickReply($(this).text());
 		});
-	}
-	
 
-	var editquick = new function(){
+		//-----------------------------------------------
+		// DELETE
 
-		var template2 = createTemplate('#editquickreplylist');
-		var inputCtrl = $('#editquickreply-add');
-
-		this.update = function(){
-			
-			template2.empty().append(quickReplies);
-			template2.container.trigger('create');
+		this.updateDeleteDialog = function(index){
+			templete2.empty().append(quickReplies[deleteIndex = index]);
 		};
 
-		this.onRemove = function(text){
-			quickReplies = $.grep(quickReplies, function(value) {return value != text;} );
+		template1.container.on('click', 'a.[href="#deleteqreply"]', function(){
+			quickreply.updateDeleteDialog(parseInt($(this).data('index')));
+		});
+
+		this.onDelete = function(){
+
+			quickReplies.splice(deleteIndex, 1);
+
 			this.update();
+
 			main.internalTrigger({type: 'quickreplieschanged', quicks: quickReplies});
-		}
+		};
+
+		$('#deleteqreply-yes').on('click', function(f) { quickreply.onDelete(); });
+
+		//-----------------------------------------------
+		// ADD
 
 		this.onAdd = function(){
-			var text = inputCtrl.val();
-			inputCtrl.val('');
-			quickReplies.push(text);
-			this.update();
-			quickReplies.sort();
-			main.internalTrigger({type: 'quickreplieschanged', quicks: quickReplies});
-		}
 
-		this.onPageBeforeShow = this.update;
-		
-		template2.container.on('click', 'a', function(){
-			quickreply.onRemove($(this).data('value'));
-		});
-		
-		$('#editquickreply-addbutton').on('click', function (){
-			quickreply.onAdd();
+			if(validator.form()){
+
+				var text = ctrl.textEdit.val();
+				ctrl.textEdit.val('');
+	
+				this.update();
+
+				quickReplies.push(text);
+				quickReplies.sort();
+
+				main.internalTrigger({type: 'quickreplieschanged', quicks: quickReplies});
+
+				return true;
+			}
+			return false;
+		};
+
+		$('#addqreply-ok').on('click', function(f){ return quickreply.onAdd(); });
+		ctrl.form.on('submit', function() { return quickreply.onAdd(); });
+
+		var validator = ctrl.form.validate({
+			onsubmit: false,
+			rules: {
+				text: {
+					required: true,
+					maxlength: 64,
+					minlength: 1
+				},
+			},
+			errorElement: 'div'
 		});
 	}
 	
@@ -1397,7 +1430,6 @@ o888o                o888o                  o888o
 	tasks.register('loginas', loginas);
 	tasks.register('selcontacts', selcontacts);
 	tasks.register('quickreply', quickreply);
-	tasks.register('editquickreply', editquick);
 	tasks.register('editmessage', editmsg);
 	tasks.register('sound', sound);
 	tasks.register('*', toasts);

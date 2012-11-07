@@ -69,46 +69,70 @@
 			</div>
 		</div>
 
-		<div id="quickreply" data-role="dialog">
-			<div data-role="header">
+		<div id="quickreply" data-role="page">
+			<div data-role="header" data-position="fixed">
 				<h1>Quick Reply</h1>
-				<a href="#editquickreply" data-mini="true">Edit</a>
 			</div>
 			<div data-role="content">
 				<div>
-					<script id="quickreplylist" type="text/x-handlebars-template">
-						<div data-role="controlgroup">
+					<ul data-role="listview" data-split-icon="delete" data-split-theme="c">
+						<script id="quickreplylist" type="text/x-handlebars-template">
+							{{resetCount}}
 							{{#each this}}
-							<a href="#sending" data-role="button">{{this}}</a>
+							<li>
+								<a href="#sending">{{this}}</a>
+								<a href="#deleteqreply" data-index="{{getCount}}"></a>
+							</li>
 							{{/each}}
-						</div>
-					</script>
+						</script>
+					</ul>
+				</div>
+			</div>
+			<div data-role="footer" data-position="fixed">
+				<div data-role="navbar">
+					<ul>
+						<li><a href="#message" data-icon="back">Cancel</a></li>
+						<li><a href="#addqreply" data-icon="plus">Add</a></li>
+					</ul>
 				</div>
 			</div>
 		</div>
 
-		<div id="editquickreply" data-role="dialog">
+		<div id="addqreply" data-role="dialog">
 			<div data-role="header">
-				<h1>Edit Quick Reply</h1>
-				<a href="#" data-icon="plus" id="editquickreply-addbutton">Add</a>
+				<h1>Add Quick Reply</h1>
 			</div>
 			<div data-role="content">
-				<div data-role="fieldcontain" class="ui-hide-label">
-					<label for="editquickreply-add">Add Reply:</label>
-					<input type="text" id="editquickreply-add" placeholder="Add Reply"></input>
-				</div>
-				<div>
-					<script id="editquickreplylist" type="text/x-handlebars-template">
-						<div data-role="controlgroup">
-							{{#each this}}
-							<a href="#" data-role="button" data-icon="minus" data-value="{{this}}">{{this}}</a>
-							{{/each}}
-						</div>
-					</script>
-				</div>
+				<form id="addqreply-form">
+					<div data-role="fieldcontain" class="ui-hide-label">
+						<label for="addqreply-text">Text:</label>
+						<input type="text" id="addqreply-text" name="text" class="required" placeholder="Text"></input>
+					</div>
+					<div class="ui-grid-a">
+						<div class="ui-block-a"><a href="#quickreply" data-role="button">Cancel</a></div>
+						<div class="ui-block-b"><a href="#quickreply" id="addqreply-ok" data-role="button">Ok</a></div>
+					</div>
+				</form>
 			</div>
 		</div>
 
+		<div id="deleteqreply" data-role="dialog">
+			<div data-role="header">
+				<h1>Delete Quick Reply</h1>
+			</div>
+			<div data-role="content">
+				<div>
+					<script id="deleteqreply-template" type="text/x-handlebars-template">
+						<h1>{{this}}</h1>
+					</script>
+				</div>
+				<div class="ui-grid-a">
+					<div class="ui-block-a"><a href="#quickreply" data-role="button">No</a></div>
+					<div class="ui-block-b"><a href="#quickreply" id="deleteqreply-yes" data-role="button">Yes</a></div>
+				</div>
+			</div>
+		</div>
+		
 		<div id="selcontacts" data-role="page">
 			<div data-role="header" data-position="fixed">
 				<a href="#message" data-icon="back">Back</a>
