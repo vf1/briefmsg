@@ -405,28 +405,38 @@
 				ui.setOptions({playWhenArrives:true, playAfterSending:false});
 				ui.setLoginInfo({name:'user', password:'pass', domain:'officesip.local', proxy:'192.168.1.1:5060'});
 				ui.setContacts([
-					{ status: 'online', name: 'Brian Kernighan', uri: 'sip:kernighan@officesip.local' },
-					{ status: 'online', name: 'Bjarne Stroustrup', uri: 'sip:stroustrup@officesip.local' },
-					{ status: 'online', name: 'Alexander Stepanov', uri: 'sip:stepanov@officesip.local' },
-					{ status: 'online', name: 'Donald Knuth', uri: 'sip:knuth@officesip.local' },
-					{ status: 'online', name: 'Dennis Ritchie', uri: 'sip:ritchie@officesip.local' },
-					{ status: 'online', name: 'Niklaus Wirth', uri: 'sip:wirth@officesip.local' },
-					{ status: 'offline', name: 'Charles Babbage', uri: 'sip:babbage@officesip.local' }
+					{ status: 'online', name: 'Mr Petersen', uri: 'sip:petersen@officesip.local' },
+					{ status: 'online', name: 'Ms Bank', uri: 'sip:bank@officesip.local' },
+					{ status: 'away', name: 'John Doe', uri: 'sip:jdoe@officesip.local' },
+					{ status: 'away', name: 'Smith', uri: 'sip:smith@officesip.local' }
 				]);
 				ui.setMessages([
-					{ sender: 'sip:ritchie@officesip.local', time: new Date(), text: "Ritchie was best known as the creator of the C programming language, a key developer of the Unix operating system, and co-author of the book The C Programming Language, and was the 'R' in K&R."},
-					{ sender: 'sip:kernighan@officesip.local', time: new Date(), text: "Kernighan's name became widely known through co-authorship of the first book on the C programming language with Dennis Ritchie."},
-					{ sender: 'sip:stepanov@officesip.local', time: new Date(), text: "Alexander Alexandrovich Stepanov (born November 16, 1950 in Moscow) is the primary designer and implementer of the C++ Standard Template Library, which he started to develop around 1992 while employed at HP Labs."},
-					{ sender: 'sip:knuth@officesip.local', time: new Date(), text: "He is the author of the seminal multi-volume work The Art of Computer Programming. Knuth has been called the 'father' of the analysis of algorithms. "},
-					{ sender: 'sip:stroustrup@officesip.local', time: new Date(), text: "Bjarne Stroustrup is a Danish computer scientist, most notable for the creation and the development of the widely used C++ programming language"},
-					{ sender: 'sip:wirth@officesip.local', time: new Date(), text: "Niklaus Emil Wirth (born February 15, 1934) is a Swiss computer scientist, best known for designing several programming languages, including Pascal, and for pioneering several classic topics in software engineering"}
-				]);
+					{ sender: 'sip:petersen@officesip.local', time: new Date(), text: "Hi, how can I help you?"},
+					{ sender: 'sip:petersen@officesip.local', time: new Date(), text: "Did you get your certificate ?"},
+					{ sender: 'sip:bank@officesip.local', time: new Date(), text: "It's okay."},
+					{ sender: 'sip:jdoe@officesip.local', time: new Date(), text: "Really thanks, I don’t know what to say, it’s really amazing work…"},
+					{ sender: 'sip:petersen@officesip.local', time: new Date(), text: "Wait a moment..."},
+					{ sender: 'sip:bank@officesip.local', time: new Date(), text: "Ok"},
+					{ sender: 'sip:jdoe@officesip.local', time: new Date(), text: "I will call them back"}
+				], 0);
 				ui.setQuickReplies(['Thank you!', 'Sorry, I am busy', 'Wait a moment...', 'OK', 'Yes', 'No', 'Ask them to leave a message',
 					'Tell them to call me back', 'I will call them back', 'Yes, I know']);
 				
 				ui.on('login', sip.register);
 				ui.on('logout', sip.unRegister);
 				ui.on('send', function(e) { sip.send(e.to, e.text); });
+
+				ui.on('get-xcap-contacts', function() {
+					setTimeout(function() {
+						ui.trigger({ type:'xcapdone', contacts: [
+							{ status: 'online', name: 'John Doe #1', uri: 'sip:jdoe1@officesip.local' },
+							{ status: 'offline', name: 'John Doe #2', uri: 'sip:jdoe2@officesip.local' },
+							{ status: 'away', name: 'John Doe #3', uri: 'sip:jdoe3@officesip.local' },
+							{ status: 'busy', name: 'John Doe #4', uri: 'sip:jdoe4@officesip.local' },
+							{ status: 'online', name: 'John Doe #5', uri: 'sip:jdoe5@officesip.local' }
+						]});
+					}, 2000);
+				});
 
 				ui.setItem = function() {};
 				ui.getItem = function(shortName) {
@@ -439,6 +449,7 @@
 			else{
 				var sip = new sipClient();
 				var xcap = new xcapClient();
+				var messageIndex = 0;
 		
 				function loadJsonedObject(key, defaultValue){
 					var jsoned;
@@ -469,7 +480,7 @@
 				ui.setOptions(loadJsonedObject('com.briefmsg.options', {playWhenArrives:true, playAfterSending:false}));
 				ui.setLoginInfo(loadLoginInfo());
 				ui.setContacts(loadJsonedObject('com.briefmsg.contacts', []));
-				ui.setMessages(loadMessages());
+				ui.setMessages(loadMessages(), loadJsonedObject('com.briefmsg.messageindex', messageIndex));
 				ui.setQuickReplies(loadJsonedObject('com.briefmsg.quicks',
 					['Thank you!', 'Sorry, I am busy', 'Wait a moment...', 'OK', 'Yes', 'No', 'Ask them to leave a message',
 					'Tell them to call me back', 'I will call them back', 'Yes, I know']));
@@ -529,6 +540,13 @@
 
 				sip.onAny(ui.trigger);
 				xcap.onAny(ui.trigger);
+
+
+				setInterval(function() {
+					if(ui.getMessageIndex() != messageIndex) {
+						saveJsonedObject('com.briefmsg.messageindex', messageIndex = ui.getMessageIndex());
+					}
+				}, 2000);
 			};
 
 			var getServerAddress = function(realm, proxy) {

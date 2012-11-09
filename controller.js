@@ -84,6 +84,10 @@ o.  )88b 888    .o  888  .o.      888   .o8 888   888  888   888    888 . d8(  8
 		var allContacts = [];
 		var template1 = createTemplate('#selcontacts-li-unchecked');
 		var template2 = createTemplate('#selcontacts-li-checked');
+
+		var ctrl = new function() {
+			this.textBtn = $('#selcontacts a.[href="#editmessage"]');
+		}
 	
 		this.getSelected = function(){
 			return $.grep(allContacts, function(value, index) { return selected[index]; } );
@@ -97,6 +101,8 @@ o.  )88b 888    .o  888  .o.      888   .o8 888   888  888   888    888 . d8(  8
 		
 			createContacts();
 			this._setSelectedUri(select);
+
+			this._updateCtrls();
 		}
 
 		this._setSelectedUri = function(select){
@@ -110,10 +116,17 @@ o.  )88b 888    .o  888  .o.      888   .o8 888   888  888   888    888 . d8(  8
 			});
 		}
 
+		this._updateCtrls = function() {
+
+			enableButton(ctrl.textBtn, jQuery.inArray(true, selected) >= 0);
+		}
+
 		this.onPageBeforeShow = function(){
 
 			createContacts();
 			this.refreshListview();
+
+			this._updateCtrls();
 		};
 
 		this.refreshListview = function(){
@@ -191,6 +204,8 @@ o.  )88b 888    .o  888  .o.      888   .o8 888   888  888   888    888 . d8(  8
 				li.replaceWith(template2.get({contact:allContacts[index], index:index}));
 			selected[index] = !selected[index];
 			template1.container.listview('refresh');
+
+			this._updateCtrls();
 		};
 		
 		template1.container.on('click', 'li', function(f){
@@ -1337,7 +1352,11 @@ o888o                o888o                  o888o
 	}
 
 	
-	
+
+	this.getMessageIndex = function() {
+		return messagesui.index;
+	}
+
 	this.setOptions = function(value){
 		options = value;
 	}
@@ -1350,8 +1369,13 @@ o888o                o888o                  o888o
 		quickReplies = array;
 	};
 	
-	this.setMessages = function(array){
+	this.setMessages = function(array, index){
 		messages = array;
+		if(index > array.length-1)
+			index = array.length-1;
+		if(index < 0)
+			index = 0;
+		messagesui.index = index;
 	};
 	
 	this.setLoginInfo = function(login){
