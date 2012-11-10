@@ -832,6 +832,7 @@ o888o o888o o888o `Y8bod8P' 8""888P' 8""888P' `Y888""8o `8oooooo.  `Y8bod8P'
 			this.deletex = $('a.[href="#message-delete"]');
 			this.noMessage = $('#message-nomessages');
 			this.newMessage = $('#message a.[href="#selcontacts"]');
+			this.status = $('#message a.[href="#status"]');
 			
 			this.enable = function(name, value){
 				var flagName = 'is' + name + 'Enabled';
@@ -909,6 +910,7 @@ o888o o888o o888o `Y8bod8P' 8""888P' 8""888P' `Y888""8o `8oooooo.  `Y8bod8P'
 			ctrl.enable('reply', (messages.length > 0) && connected);
 			ctrl.enable('deletex', messages.length > 0);
 			ctrl.enable('newMessage', connected);
+			ctrl.enable('status', connected);
 		};
 		
 		this.onPageHide = function(){
