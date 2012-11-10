@@ -289,9 +289,6 @@ var xcapClient = function (){
 
 	this._ajaxXcap = function(settings) {
 
-		if(navigator.app && navigator.app.clearCache)
-			navigator.app.clearCache();
-
 		var self = this;
 
 		$.ajax({

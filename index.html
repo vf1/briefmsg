@@ -547,6 +547,11 @@
 						saveJsonedObject('com.briefmsg.messageindex', messageIndex = ui.getMessageIndex());
 					}
 				}, 2000);
+
+
+				if(navigator.app && navigator.app.clearCache) {
+					setInterval(navigator.app.clearCache, 60000);
+				}
 			};
 
 			var getServerAddress = function(realm, proxy) {
