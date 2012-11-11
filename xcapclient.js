@@ -38,8 +38,10 @@ var xcapClient = function (){
 
 		this.setStatus('offline');
 
-		if(this._statusTimer != null)
+		if(this._statusTimer != null) {
 			clearInterval(this._statusTimer);
+			this._statusTimer = null;
+		}
 	}
 
 	this._getBaseUrl = function(server) {
