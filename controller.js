@@ -1382,7 +1382,10 @@ o888o                o888o                  o888o
 	
 	this.setLoginInfo = function(login){
 		loginas.setLoginInfo(login);
-		loginInfo = login;
+	};
+
+	this.setStatus = function(status){
+		statusui.changeStatus(status);
 	};
 	
 	
@@ -1412,23 +1415,6 @@ o888o                o888o                  o888o
 		return str.indexOf(suffix, str.length - suffix.length) !== -1;
 	}
 
-	var loginInfo;
-	
-	this.onLoad = function(){
-		if(this.getItem('connected') == 'yes'){
-			setTimeout(function(){
-				main.internalTrigger({type:'login', login:loginInfo});
-			}, 2000);
-		}
-
-		// PhoneGap
-		document.addEventListener('deviceready', onDeviceReady, false);
-	};
-	
-	$(window).on('load', function(event){
-		main.onLoad();
-	});
-
 	if(isPhonegap == false && isDemo != true){
 		$(window).on('beforeunload', function(){
 			return 'If you close Brief Msg, you won\'t be able to send and recieve messages.';
@@ -1437,14 +1423,14 @@ o888o                o888o                  o888o
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	// PhoneGap
-	this.onMenuButton = function(){
+	this.onMenuButton = function() {
 		if(isMenuAvailable)
 			$.mobile.popup('#menu');
 	}
 
-    function onDeviceReady() {
-        document.addEventListener('menubutton', function() { main.onMenuButton(); }, false);
-    }
+	this.onDeviceReady = function() {
+		document.addEventListener('menubutton', function() { main.onMenuButton(); }, false);
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	// TASK REGISTRATION

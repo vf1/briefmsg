@@ -389,15 +389,18 @@
 		<script src="src/tinySIP/src/tsip_api.js"></script>
 		<script src="sipclient.js"></script>
 		<script src="sipdemoclient.js"></script>
+		<script src="desktop.js"></script>
 		<script src="debug.js"></script>
 
 		<script type="text/javascript">
+		var nw, ui;
+
 		(function (){
 
 			var params = $.getUrlVars();
 			var isDemo = parseInt(params['demo']) > 0;
 			
-			var ui = new controller(isDemo);
+			ui = new controller(isDemo);
 			
 			if(isDemo){
 				var sip = window.sipDemo = new sipDemoClient();
@@ -541,6 +544,27 @@
 				sip.onAny(ui.trigger);
 				xcap.onAny(ui.trigger);
 
+				ui.on('statuschanged', function(e) {
+					nw.setStatus(e.status);
+				});
+
+				sip.onAny(function(e) {
+					if(e.type === 'connected')
+						nw.setStatus('online');
+					else if(e.type === 'disconnected')
+						nw.setStatus('offline');
+				});
+
+				var loginTimer;
+				var onBeforeQuit = function() {
+					if(loginTimer)
+						clearTimeout(loginTimer);
+					ui.internalTrigger({ type: 'logout' });
+				}
+
+				nw = new desktop();
+				nw.initialize(ui.setStatus, onBeforeQuit);
+
 
 				setInterval(function() {
 					if(ui.getMessageIndex() != messageIndex) {
@@ -552,6 +576,20 @@
 				if(navigator.app && navigator.app.clearCache) {
 					setInterval(navigator.app.clearCache, 60000);
 				}
+
+				$(window).on('load', function(event){
+					if(ui.getItem('connected') == 'yes') {
+						loginTimer = setTimeout(function() {
+							ui.internalTrigger({type:'login', login:loadLoginInfo()});
+							}, 2000);
+					}
+
+					// PhoneGap
+					document.addEventListener('deviceready', ui.onDeviceReady, false);
+
+					nw.onLoad();
+				});
+	
 			};
 
 			var getServerAddress = function(realm, proxy) {
@@ -577,7 +615,6 @@
 
 				return { url: url, port: port };
 			}
-
 		})();
 		
 		window.emulateIncomingMessage = function(sender, text) {
