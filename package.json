@@ -7,6 +7,7 @@
   "nodejs": true,
   "single-instance": true,
   "window": {
+    "show": false,
     "icon": "images/icon32.png",
     "toolbar": true,
     "width": 420,

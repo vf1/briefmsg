@@ -334,6 +334,11 @@
 				<form id="options-form">
 					<label for="options-play-i"><input type="checkbox" id="options-play-i" name="playWhenArrives" value="true"></input>Play a sound when a new message arrives</label>
 					<label for="options-play-o"><input type="checkbox" id="options-play-o" name="playAfterSending" value="true"></input>Play a sound after sending message</label>
+					<div class="desktop">
+						<label for="options-alway-on-top"><input type="checkbox" id="options-alway-on-top" name="alwaysOnTop" value="true"></input>Always on top</label>
+						<label for="options-run-minimized"><input type="checkbox" id="options-run-minimized" name="runMinimized" value="true"></input>Run program in minimized window</label>
+						<label for="options-popup-on-new"><input type="checkbox" id="options-popup-on-new" name="popupOnNew" value="true"></input>Popup on new message</label>
+					</div>
 				</form>
 				<!--
 				<label for="options-delete"><input type="checkbox" id="options-delete"></input>Delete message on reply</label>
@@ -383,23 +388,25 @@
 		<script src="assets/handlebars-1.0.0.beta.6.js"></script>
 		<script src="assets/typedarray.js"></script>
 		<script src="assets/browserDetect.js"></script>
+		<script src="assets/SIPml-api.js"></script>
 
 		<script src="xcapclient.js"></script>
 		<script src="controller.js"></script>
-		<script src="src/tinySIP/src/tsip_api.js"></script>
 		<script src="sipclient.js"></script>
 		<script src="sipdemoclient.js"></script>
 		<script src="desktop.js"></script>
 		<script src="debug.js"></script>
 
 		<script type="text/javascript">
-		var nw, ui;
+		var desktop, ui;
 
 		(function (){
 
 			var params = $.getUrlVars();
 			var isDemo = parseInt(params['demo']) > 0;
 			
+			$('.desktop').hide();
+
 			ui = new controller(isDemo);
 			
 			if(isDemo){
@@ -479,8 +486,16 @@
 				function loadLoginInfo(){
 					return loadJsonedObject('com.briefmsg.login', {domain:'officesip.local'});
 				}
-				
-				ui.setOptions(loadJsonedObject('com.briefmsg.options', {playWhenArrives:true, playAfterSending:false}));
+
+				var options = loadJsonedObject('com.briefmsg.options', {
+					playWhenArrives: true, 
+					playAfterSending: false, 
+					alwaysOnTop: false,
+					runMinimized: false,
+					popupOnNew: false
+					});
+
+				ui.setOptions(options);
 				ui.setLoginInfo(loadLoginInfo());
 				ui.setContacts(loadJsonedObject('com.briefmsg.contacts', []));
 				ui.setMessages(loadMessages(), loadJsonedObject('com.briefmsg.messageindex', messageIndex));
@@ -544,17 +559,6 @@
 				sip.onAny(ui.trigger);
 				xcap.onAny(ui.trigger);
 
-				ui.on('statuschanged', function(e) {
-					nw.setStatus(e.status);
-				});
-
-				sip.onAny(function(e) {
-					if(e.type === 'connected')
-						nw.setStatus('online');
-					else if(e.type === 'disconnected')
-						nw.setStatus('offline');
-				});
-
 				var loginTimer;
 				var onBeforeQuit = function() {
 					if(loginTimer)
@@ -562,8 +566,31 @@
 					ui.internalTrigger({ type: 'logout' });
 				}
 
-				nw = new desktop();
-				nw.initialize(ui.setStatus, onBeforeQuit);
+				desktop = new Desktop(ui.setStatus, onBeforeQuit);
+
+				if(desktop.isReady()) {
+
+					desktop.updateOptions(options);
+
+					$('.desktop').show();
+
+					ui.on('statuschanged', function(e) {
+						desktop.setStatus.call(desktop, e.status);
+					});
+
+					ui.on('optionschanged', function(e) {
+						desktop.updateOptions.call(desktop, e.options);
+					});
+
+					sip.onAny(function(e) {
+						if(e.type === 'connected')
+							desktop.setStatus.call(desktop, 'online');
+						else if(e.type === 'disconnected')
+							desktop.setStatus.call(desktop, 'offline');
+						else if(e.type === 'incomingmessage')
+							desktop.onNewMessage.call(desktop);
+					});
+				}
 
 
 				setInterval(function() {
@@ -577,6 +604,7 @@
 					setInterval(navigator.app.clearCache, 60000);
 				}
 
+
 				$(window).on('load', function(event){
 					if(ui.getItem('connected') == 'yes') {
 						loginTimer = setTimeout(function() {
@@ -587,7 +615,7 @@
 					// PhoneGap
 					document.addEventListener('deviceready', ui.onDeviceReady, false);
 
-					nw.onLoad();
+					desktop.onLoad.call(desktop);
 				});
 	
 			};
