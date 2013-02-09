@@ -1148,7 +1148,8 @@ o.  )88b 888   888  888   888   888   888  888   888
 				var audio = new Audio();
 			
 				if(typeof audio.canPlayType === 'function'){
-					if(audio.canPlayType('audio/mpeg') !== '')
+					var isNodeWebkit = (typeof process == "object");
+					if(audio.canPlayType('audio/mpeg') !== '' && isNodeWebkit == false)
 						extension = '.mp3';
 					else if(audio.canPlayType('audio/wav') !== '')
 						extension = '.wav';

@@ -24,6 +24,8 @@ var Desktop = function (setStatusEvent, beforeQuitEvent) {
 	this._width = -1;
 	this._height = -1;
 
+	this._platform = '';
+
 	this._initialize();
 }
 
@@ -36,6 +38,10 @@ Desktop.prototype = {
 
 		if(typeof this._gui === 'undefined') return;
 		this._win = this._gui.Window.get();
+
+		if(typeof process == "object")
+			this._platform = process.platform;
+		console.log(this._platform);
 
 		this._menuItems = { online: this._newMenuItem('online'), away: this._newMenuItem('away'), busy: this._newMenuItem('busy') };
 
@@ -53,7 +59,8 @@ Desktop.prototype = {
 			this._isMinimized = true;
 		}
 
-		this._win.on('minimize', $.proxy(onMinimize, this));
+		if(this._platform.indexOf('win') == 0)
+			this._win.on('minimize', $.proxy(onMinimize, this));
 		this._win.on('close', $.proxy(onMinimize, this));
 		this._tray.on('click', $.proxy(this._onRestore, this));
 
@@ -64,7 +71,12 @@ Desktop.prototype = {
 
 	_onRestore: function() {
 		this._win.show();
-		this._win.resizeTo(this._width, this._height);
+		if(this._platform.indexOf('win') == 0) {
+			this._win.resizeTo(this._width, this._height);
+		}
+		else {
+			this._win.restore();
+		}
 		this._isMinimized = false;
 		this._blink(false);
 	},
@@ -179,7 +191,9 @@ Desktop.prototype = {
 	      				this._win.moveTo(parseInt(localStorage.desktopX), parseInt(localStorage.desktopY));
 			}
 
-			if(!this._isMinimized)
+			if(this._isMinimized)
+				this._win.hide();
+			else
 				this._win.show();
 		}
 	},
